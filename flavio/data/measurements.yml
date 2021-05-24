@@ -12489,12 +12489,13 @@ LEP ee->WW angular:
       value: 7.584 ± 0.26
 
 RK Moriond 21:
+  inspire: Aaij:2021vac
   experiment: LHCb
   values:
     - name: <Rmue>(B+->Kll)
       q2min: 1.1
       q2max: 6.0
-      value: 0.846 +0.044 -0.041
+      value: 0.846 +0.042 -0.039 +0.013 -0.012
       
 Bsmumu Moriond 21:
   experiment: LHCb
