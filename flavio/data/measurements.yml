@@ -12487,3 +12487,17 @@ LEP ee->WW angular:
       thetamin: 0.8
       thetamax: 1.0
       value: 7.584 ± 0.26
+
+RK Moriond 21:
+  experiment: LHCb
+  values:
+    - name: <Rmue>(B+->Kll)
+      q2min: 1.1
+      q2max: 6.0
+      value: 0.846 +0.044 -0.041
+      
+Bsmumu Moriond 21:
+  experiment: LHCb
+  values:
+    BR(Bs->mumu): 3.09 +0.46 -0.43 +0.15 -0.11 1e-9
+    BR(B0->mumu): < 2.6e-10 @ 95% CL
