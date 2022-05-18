@@ -41,18 +41,22 @@ Original author:
 Contributors (in alphabetical order):
 
 - Jason Aebischer
+- Jorge Alda Gallo
 - Frederik Beaujean
 - Adam Falkowski
+- Tobias Felkl
 - Ece Gürler
 - Matěj Hudec
 - Matthew Kirk
 - Jonathan Kriewald
 - Jacky Kumar
+- Christoph Langenbruch
 - Christoph Niehoff
 - Markus Prim
 - Albert Puig
 - Méril Reboud
 - Stefanie Reichert
+- Niladri Sahoo
 - Peter Stangl
 - Olcyr Sumensari
 - Zeren Simon Wang
