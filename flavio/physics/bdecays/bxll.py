@@ -3,7 +3,7 @@ r"""Functions for inclusive $B\to X_q\ell^+\ell^-$ decays.
 See arXiv:1503.04849."""
 
 import flavio
-import numpy as np
+import jax.numpy as jnp
 from math import pi, log, sqrt
 from flavio.math.functions import li2
 from flavio.classes import Observable, Prediction
@@ -247,9 +247,9 @@ def Phill_pc_mb2(I, sh, l1, l2, mb, wc, q, lep):
     bq = 'b'+q
     bqll = bq + lep + lep
     coeffs = ['C1_'+bq, 'C2_'+bq, 'C3_'+bq, 'C4_'+bq, 'C5_'+bq, 'C6_'+bq, 'C7eff_'+bq, 'C8eff_'+bq, 'C9_'+bqll, 'C10_'+bqll]
-    wc1_10 = np.array([0] + [wc[name] for name in coeffs]) # first entry 0 to shift index by 1
-    chi1 = np.zeros((11, 11))
-    chi2 = np.zeros((11, 11))
+    wc1_10 = jnp.array([0] + [wc[name] for name in coeffs]) # first entry 0 to shift index by 1
+    chi1 = jnp.zeros((11, 11))
+    chi2 = jnp.zeros((11, 11))
     if I == 'T':
         chi1[7, 7] = 4/(3*sh) * (1-sh) * (5 * sh+3)
         chi1[7, 9] = 4 * (1-sh)**2
@@ -271,8 +271,8 @@ def Phill_pc_mb2(I, sh, l1, l2, mb, wc, q, lep):
         chi2[9, 10] = -2 * sh * (15 * sh**2-14 * sh-9)
     else:
         raise ValueError("I should be 'T', 'L', or 'A'")
-    return ( l1/mb**2 * np.dot(wc1_10, np.dot(chi1, wc1_10.conj()))
-           + l2/mb**2 * np.dot(wc1_10, np.dot(chi2, wc1_10.conj())) ).real
+    return ( l1/mb**2 * jnp.dot(wc1_10, jnp.dot(chi1, wc1_10.conj()))
+           + l2/mb**2 * jnp.dot(wc1_10, jnp.dot(chi2, wc1_10.conj())) ).real
 
 def Phill_logqed(I, sh, mb, ml, alpha_s, alpha_e, wc, q, lep, mc):
     # log-enhanced QED corrections to Phi_ll
@@ -281,14 +281,14 @@ def Phill_logqed(I, sh, mb, ml, alpha_s, alpha_e, wc, q, lep, mc):
     ast = alpha_s/(4*pi)
     k = alpha_e/alpha_s
     coeffs = ['C1_'+bq, 'C2_'+bq, 'C3_'+bq, 'C4_'+bq, 'C5_'+bq, 'C6_'+bq, 'C7eff_'+bq, 'C8eff_'+bq, 'C9_'+bqll, 'C10_'+bqll]
-    wc1_10 = np.array([0] + [wc[name] for name in coeffs]) # first entry 0 to shift index by 1
+    wc1_10 = jnp.array([0] + [wc[name] for name in coeffs]) # first entry 0 to shift index by 1
     scale = flavio.config['renormalization scale']['bxll']
     # (4.19) of 1503.04849
     # Note the different powers of ast (\tilde\alpha_s) and k (\kappa) due to
     # the different normalisation of 1) C9 and C10 and 2) the overall
     # normalisation of phi_ll
     flavio.citations.register("Huber:2015sra")
-    e = np.zeros((11, 11), dtype=complex) # from 0 to 10
+    e = jnp.zeros((11, 11), dtype=complex) # from 0 to 10
     if I == 'T' or I == 'L' or I == 'BR':
         e[7,7] = 8 * ast    * k    * sigmaij_I(I, 7, 7, sh)*wem(I, 7, 7, sh, mb, ml, scale, mc)
         e[7,9] = 8 * ast    * k    * sigmaij_I(I, 7, 9, sh)*wem(I, 7, 9, sh, mb, ml, scale, mc)
@@ -308,7 +308,7 @@ def Phill_logqed(I, sh, mb, ml, alpha_s, alpha_e, wc, q, lep, mc):
         e[1,10] = 4/3. *  e[2,10]
     else:
         raise ValueError("I should be 'T', 'L', 'BR', or 'A'")
-    return np.dot(wc1_10, np.dot(e, wc1_10.conj())).real
+    return jnp.dot(wc1_10, jnp.dot(e, wc1_10.conj())).real
 
 # kinematical prefactors
 def sigma77_T(sh):

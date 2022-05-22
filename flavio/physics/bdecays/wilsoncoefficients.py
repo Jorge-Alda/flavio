@@ -3,7 +3,7 @@ as tree-level $B$ decays"""
 
 
 from math import sqrt, log, pi
-import numpy as np
+import jax.numpy as jnp
 import scipy.interpolate
 from flavio.physics.running import running
 from flavio.physics import ckm
@@ -24,8 +24,9 @@ import pkg_resources
 # where all operators are defined as in hep-ph/0512066 *except*
 # C_9,10, which are defined with an additional alpha/4pi prefactor.
 scales = (2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5)
-# data = np.array([C_low(s, 120, get_par(), nf=5) for s in scales]).T
-data = np.load(pkg_resources.resource_filename('flavio.physics', 'data/wcsm/wc_sm_dB1_2_55.npy'))
+# data = jnp.array([C_low(s, 120, get_par(), nf=5) for s in scales]).T
+data = jnp.load(pkg_resources.resource_filename(
+    'flavio.physics', 'data/wcsm/wc_sm_dB1_2_55.npy'))
 wcsm_nf5 = scipy.interpolate.interp1d(scales, data)
 
 # di->djnunu Wilson coefficient
@@ -84,10 +85,10 @@ def wctot_dict(wc_obj, sector, scale, par, nf_out=5):
     flavio.citations.register("Bobeth:2013uxa")
     wc_sm[9] = wc_sm[9] * (par['m_t']/173.1)**1.53
     # go from the effective to the "non-effective" WCs for C7 and C8
-    yi = np.array([0, 0, -1/3., -4/9., -20/3., -80/9.])
-    zi = np.array([0, 0, 1, -1/6., 20, -10/3.])
-    wc_sm[6] = wc_sm[6] - np.dot(yi, wc_sm[:6]) # c7 (not effective!)
-    wc_sm[7] = wc_sm[7] - np.dot(zi, wc_sm[:6]) # c8 (not effective!)
+    yi = jnp.array([0, 0, -1/3., -4/9., -20/3., -80/9.])
+    zi = jnp.array([0, 0, 1, -1/6., 20, -10/3.])
+    wc_sm[6] = wc_sm[6] - jnp.dot(yi, wc_sm[:6])  # c7 (not effective!)
+    wc_sm[7] = wc_sm[7] - jnp.dot(zi, wc_sm[:6])  # c8 (not effective!)
     wc_labels = fcnclabels[sector]
     wc_sm_dict = dict(zip(wc_labels, wc_sm))
     # now here comes an ugly fix. If we have b->s transitions, we should take
@@ -106,15 +107,17 @@ def wctot_dict(wc_obj, sector, scale, par, nf_out=5):
 def get_C78eff(wc, qiqj):
     r"""Return the effective Wilson coefficients $C_{7,8}^\text{eff}$
     for sector `qiqj` (e.g. 'bs')."""
-    yi = np.array([-1/3., -4/9., -20/3., -80/9.])
-    zi = np.array([1, -1/6., 20, -10/3.])
+    yi = jnp.array([-1/3., -4/9., -20/3., -80/9.])
+    zi = jnp.array([1, -1/6., 20, -10/3.])
     wceff = {}
-    C36 = np.array([wc[k] for k in ['C3_'+qiqj, 'C4_'+qiqj, 'C5_'+qiqj, 'C6_'+qiqj]])
-    C36p = np.array([wc[k] for k in ['C3p_'+qiqj, 'C4p_'+qiqj, 'C5p_'+qiqj, 'C6p_'+qiqj]])
-    wceff['C7eff_' + qiqj] = wc['C7_' + qiqj] + np.dot(yi, C36)
-    wceff['C8eff_' + qiqj] = wc['C8_' + qiqj] + np.dot(zi, C36)
-    wceff['C7effp_' + qiqj] = wc['C7p_' + qiqj] + np.dot(yi, C36p)
-    wceff['C8effp_' + qiqj] = wc['C8p_' + qiqj] + np.dot(zi, C36p)
+    C36 = jnp.array([wc[k]
+                     for k in ['C3_'+qiqj, 'C4_'+qiqj, 'C5_'+qiqj, 'C6_'+qiqj]])
+    C36p = jnp.array(
+        [wc[k] for k in ['C3p_'+qiqj, 'C4p_'+qiqj, 'C5p_'+qiqj, 'C6p_'+qiqj]])
+    wceff['C7eff_' + qiqj] = wc['C7_' + qiqj] + jnp.dot(yi, C36)
+    wceff['C8eff_' + qiqj] = wc['C8_' + qiqj] + jnp.dot(zi, C36)
+    wceff['C7effp_' + qiqj] = wc['C7p_' + qiqj] + jnp.dot(yi, C36p)
+    wceff['C8effp_' + qiqj] = wc['C8p_' + qiqj] + jnp.dot(zi, C36p)
     return wceff
 
 def get_wceff(q2, wc, par, B, M, lep, scale):

@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import flavio
 
 par = flavio.default_parameters.get_central_all()

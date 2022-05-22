@@ -1,4 +1,4 @@
-import numpy as np
+import jax.numpy as jnp
 from functools import lru_cache
 from flavio.physics.bdecays.formfactors.common import z
 from flavio.config import config
@@ -24,7 +24,7 @@ process_dict['B->pi'] = {'B': 'B+', 'P': 'pi0'}
 def zs(mB, mP, q2, t0):
     zq2 = z(mB, mP, q2, t0)
     z0 = z(mB, mP, 0, t0)
-    return np.array([1, zq2-z0, (zq2-z0)**2])
+    return jnp.array([1, zq2-z0, (zq2-z0)**2])
 
 
 def ff(process, q2, par, n=3, t0=None):
@@ -47,7 +47,9 @@ def ff(process, q2, par, n=3, t0=None):
     a0_f0 = par[process + ' BSZ a0_f+']
     a['f0'] = [a0_f0] + [par[process + ' BSZ a' + str(j) + '_f0'] for j in range(1, n)]
     # evaluate FFs
-    ff['f+'] = pole('f+', mpl, q2) * np.dot(a['f+'], zs(mB, mP, q2, t0=t0)[:n])
-    ff['fT'] = pole('fT', mpl, q2) * np.dot(a['fT'], zs(mB, mP, q2, t0=t0)[:n])
-    ff['f0'] = pole('f0', m0, q2) * np.dot(a['f0'], zs(mB, mP, q2, t0=t0)[:n])
+    ff['f+'] = pole('f+', mpl, q2) * \
+        jnp.dot(a['f+'], zs(mB, mP, q2, t0=t0)[:n])
+    ff['fT'] = pole('fT', mpl, q2) * \
+        jnp.dot(a['fT'], zs(mB, mP, q2, t0=t0)[:n])
+    ff['f0'] = pole('f0', m0, q2) * jnp.dot(a['f0'], zs(mB, mP, q2, t0=t0)[:n])
     return ff

@@ -1,5 +1,5 @@
 from math import sqrt
-import numpy as np
+import jax.numpy as jnp
 from flavio.physics.bdecays.formfactors.common import z
 from flavio.config import config
 from functools import lru_cache
@@ -8,7 +8,7 @@ from functools import lru_cache
 def zs(mB, mV, q2, t0):
     zq2 = z(mB, mV, q2, t0)
     z0 = z(mB, mV, 0, t0)
-    return np.array([1, zq2-z0, (zq2-z0)**2])
+    return jnp.array([1, zq2-z0, (zq2-z0)**2])
 
 def pole(ff,mres,q2):
     mresdict = {'A0': 0,'A1': 2,'A12': 2,'V': 1,'T1': 1,'T2': 2,'T23': 2}
@@ -52,5 +52,5 @@ def ff(process, q2, par, n=2, omit_A='A0'):
     par[par_prefix + ' a0_T2'] = par[par_prefix + ' a0_T1']
     for i in ["A0","A1","A12","V","T1","T2","T23"]:
         a = [ par[par_prefix + ' a' + str(j) + '_' + i] for j in range(n) ]
-        ff[i] = pole(i, mres, q2)*np.dot(a, zs(mB, mV, q2, t0=None)[:n])
+        ff[i] = pole(i, mres, q2)*jnp.dot(a, zs(mB, mV, q2, t0=None)[:n])
     return ff

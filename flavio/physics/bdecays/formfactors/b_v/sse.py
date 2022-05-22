@@ -1,10 +1,10 @@
 from math import sqrt
-import numpy as np
+import jax.numpy as jnp
 from flavio.physics.bdecays.formfactors.common import z
 
 def zs(mB, mV, q2, t0):
     zq2 = z(mB, mV, q2, t0)
-    return np.array([1, zq2, zq2**2])
+    return jnp.array([1, zq2, zq2**2])
 
 def pole(ff,mres,q2):
     mresdict = {'A0': 0,'A1': 2,'A12': 2,'V': 1,'T1': 1,'T2': 2,'T23': 2}
@@ -39,5 +39,5 @@ def ff(process, q2, par, n=2):
     ff = {}
     for i in ["A0","A1","A12","V","T1","T2","T23"]:
         a = [ par[process + ' SSE ' + i.lower() + '_' + 'a' + str(j)] for j in range(n) ]
-        ff[i] = pole(i, mres, q2)*np.dot(a, zs(mB, mV, q2, t0=12.)[:n])
+        ff[i] = pole(i, mres, q2)*jnp.dot(a, zs(mB, mV, q2, t0=12.)[:n])
     return ff

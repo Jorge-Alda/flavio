@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from .parameters import *
 from .classes import *
 from .parameters import FlavioParticle, p_data

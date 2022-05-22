@@ -1,5 +1,5 @@
 from math import sqrt
-import numpy as np
+import jax.numpy as jnp
 from flavio.physics.bdecays.formfactors.b_v.isgurwise import isgur_wise
 
 

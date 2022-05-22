@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from . import matrixelements
 from flavio.physics.eft import WilsonCoefficients
 from flavio.physics.bdecays.wilsoncoefficients import wctot_dict
@@ -59,6 +59,9 @@ class TestBMatrixElements(unittest.TestCase):
         self.assertAlmostEqual(matrixelements.h(1e-8, 1.2, 4.2), matrixelements.h(0., 1.2, 4.2), places=6)
         # comparing roughly to the plots in hep-ph/0403185v2 (but with opposite sign!)
         x = [2.5, 4.75, 4.75]
-        np.testing.assert_almost_equal(-matrixelements.Fu_17(*x), 1.045 + 0.62j, decimal=1)
-        np.testing.assert_almost_equal(-matrixelements.Fu_19(*x), -0.57 + 8.3j, decimal=1)
-        np.testing.assert_almost_equal(-matrixelements.Fu_29(*x), -13.9 + -32.5j, decimal=0)
+        jnp.testing.assert_almost_equal(-matrixelements.Fu_17(*x),
+                                        1.045 + 0.62j, decimal=1)
+        jnp.testing.assert_almost_equal(-matrixelements.Fu_19(*
+                                                              x), -0.57 + 8.3j, decimal=1)
+        jnp.testing.assert_almost_equal(-matrixelements.Fu_29(*
+                                                              x), -13.9 + -32.5j, decimal=0)

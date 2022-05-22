@@ -12,16 +12,17 @@ precision.
 """
 
 import flavio
-import numpy as np
+import jax.numpy as jnp
 import pkgutil
 import pkg_resources
 import scipy.interpolate
 import math
 import warnings
 
-q2_arr = np.arange(0 + 1e-6, 9 + 1e-6, 0.1)
+q2_arr = jnp.arange(0 + 1e-6, 9 + 1e-6, 0.1)
 
-data = np.load(pkg_resources.resource_filename('flavio.physics', 'data/qcdf_interpolate/qcdf_interpolate.npz'))
+data = jnp.load(pkg_resources.resource_filename(
+    'flavio.physics', 'data/qcdf_interpolate/qcdf_interpolate.npz'))
 
 interpolating_function_dict = {}
 for process, hel_amps in data.items():

@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.physics.bdecays.formfactors.b_v import bsz_parameters
 from flavio.physics.bdecays.bvll import observables, observables_bs

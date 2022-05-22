@@ -1,6 +1,6 @@
 import unittest
 from .bll import *
-import numpy as np
+import jax.numpy as jnp
 from .. import ckm
 from math import radians
 from flavio.physics.eft import WilsonCoefficients

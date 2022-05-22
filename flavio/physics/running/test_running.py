@@ -1,6 +1,6 @@
 import unittest
 from .running import *
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.config import config
 
@@ -63,13 +63,18 @@ class TestRunning(unittest.TestCase):
 
     def test_runningmasses(self):
         # compare to RunDec
-        np.testing.assert_almost_equal(get_mb(par, 120.)/2.79211, 1,decimal=2)
-        np.testing.assert_almost_equal(get_mt(par, 120.)/167.225, 1,decimal=2)
+        jnp.testing.assert_almost_equal(
+            get_mb(par, 120.)/2.79211, 1, decimal=2)
+        jnp.testing.assert_almost_equal(
+            get_mt(par, 120.)/167.225, 1, decimal=2)
 
     def test_polemasses(self):
-        np.testing.assert_almost_equal(get_mb_pole(par, nl=2)/4.78248, 1,decimal=2)
-        np.testing.assert_almost_equal(get_mc_pole(par, nl=2)/1.68375, 1,decimal=2)
-        np.testing.assert_almost_equal(get_mb_pole(par, nl=3)/4.92987, 1,decimal=2)
+        jnp.testing.assert_almost_equal(
+            get_mb_pole(par, nl=2)/4.78248, 1, decimal=2)
+        jnp.testing.assert_almost_equal(
+            get_mc_pole(par, nl=2)/1.68375, 1, decimal=2)
+        jnp.testing.assert_almost_equal(
+            get_mb_pole(par, nl=3)/4.92987, 1, decimal=2)
 
     def test_ksmass(self):
         # compare to 1107.3100

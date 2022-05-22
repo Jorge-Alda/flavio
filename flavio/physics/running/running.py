@@ -3,7 +3,7 @@
 from flavio.physics.running import betafunctions
 from flavio.physics.running import masses
 from scipy.integrate import odeint
-import numpy as np
+import jax.numpy as jnp
 from functools import lru_cache
 from flavio.config import config
 import copy
@@ -18,7 +18,7 @@ def _thresholds():
         4: config['RGE thresholds']['mc'],
         5: config['RGE thresholds']['mb'],
         6: config['RGE thresholds']['mt'],
-        7: np.inf,
+        7: jnp.inf,
         }
     return thresholds
 
@@ -290,11 +290,11 @@ def make_wilson_rge_derivative(adm):
         alpha_s = x[-2]
         alpha_e = x[-1]
         c_real = x[:-2]
-        c = c_real.view(np.complex)
+        c = c_real.view(jnp.complex)
         d_alpha = betafunctions.beta_qcd_qed([alpha_s, alpha_e], mu, nf)
-        d_c = np.dot(adm(nf, alpha_s, alpha_e).T, c)/mu
-        d_c_real = d_c.view(np.float)
-        return np.append(d_c_real, d_alpha)
+        d_c = jnp.dot(adm(nf, alpha_s, alpha_e).T, c)/mu
+        d_c_real = d_c.view(jnp.float)
+        return jnp.append(d_c_real, d_alpha)
     def derivative_nf(nf):
         return lambda x, mu: derivative(x, mu, nf)
     return derivative_nf
@@ -307,11 +307,11 @@ def get_wilson(par, c_in, derivative_nf, scale_in, scale_out, nf_out=None):
     """
     alpha_in = get_alpha(par, scale_in, nf_out=nf_out)
     # x is (c_1, ..., c_N, alpha_s, alpha_e)
-    c_in_real = np.asarray(c_in, dtype=complex).view(np.float)
-    x_in = np.append(c_in_real, [alpha_in['alpha_s'], alpha_in['alpha_e']])
+    c_in_real = jnp.asarray(c_in, dtype=complex).view(jnp.float)
+    x_in = jnp.append(c_in_real, [alpha_in['alpha_s'], alpha_in['alpha_e']])
     sol = rg_evolve_sm(x_in, derivative_nf, scale_in, scale_out, nf_out=nf_out)
     c_out = sol[:-2]
-    return c_out.view(np.complex)
+    return c_out.view(jnp.complex)
 
 def get_f_perp(par, meson, scale, nf_out=None):
     r"""Get the transverse meson decay constant at a given scale.

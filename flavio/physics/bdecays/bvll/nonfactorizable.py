@@ -5,7 +5,7 @@ quark-loop spectator scattering.
 """
 
 import flavio
-import numpy as np
+import jax.numpy as jnp
 from flavio.classes import AuxiliaryQuantity, Implementation
 from flavio.physics.bdecays.common import meson_quark
 from flavio.physics.bdecays.wilsoncoefficients import wctot_dict

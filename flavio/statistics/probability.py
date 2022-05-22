@@ -1,6 +1,8 @@
 """Probability distributions and auxiliary functions to deal with them."""
 
+import jax.numpy as jnp
 import numpy as np
+from jax import vmap
 import scipy.stats
 from scipy.interpolate import interp1d, RegularGridInterpolator
 import scipy.signal
@@ -97,22 +99,22 @@ class ProbabilityDistribution(object):
                     od[k] = od[k].get_dict(distribution=True)
         if arraytolist:
             for k in od:
-                if isinstance(od[k], np.ndarray):
+                if isinstance(od[k], jnp.ndarray):
                     od[k] = od[k].tolist()
                 if isinstance(od[k], list):
                     for i, x in enumerate(od[k]):
-                        if isinstance(x, np.ndarray):
+                        if isinstance(x, jnp.ndarray):
                             od[k][i] = od[k][i].tolist()
         for k in od:
-            if isinstance(od[k], np.int):
+            if isinstance(od[k], jnp.int):
                 od[k] = int(od[k])
-            elif isinstance(od[k], np.float):
+            elif isinstance(od[k], jnp.float):
                 od[k] = float(od[k])
             if isinstance(od[k], list):
                 for i, x in enumerate(od[k]):
-                    if isinstance(x, np.float):
+                    if isinstance(x, jnp.float):
                         od[k][i] = float(od[k][i])
-                    elif isinstance(x, np.int):
+                    elif isinstance(x, jnp.int):
                         od[k][i] = int(od[k][i])
         return od
 
@@ -158,16 +160,16 @@ class UniformDistribution(ProbabilityDistribution):
                '({}, {})'.format(self.central_value, self.half_range)
 
     def get_random(self, size=None):
-        return np.random.uniform(self.range[0], self.range[1], size)
+        return jnp.random.uniform(self.range[0], self.range[1], size)
 
     def _logpdf(self, x):
         if x < self.range[0] or x >= self.range[1]:
-            return -np.inf
+            return -jnp.inf
         else:
             return -math.log(2 * self.half_range)
 
     def logpdf(self, x):
-        _lpvect = np.vectorize(self._logpdf)
+        _lpvect = jnp.vectorize(self._logpdf)
         return _lpvect(x)
 
     def get_error_left(self, nsigma=1, **kwargs):
@@ -200,16 +202,16 @@ class DeltaDistribution(ProbabilityDistribution):
         if size is None:
             return self.central_value
         else:
-            return self.central_value * np.ones(size)
+            return self.central_value * jnp.ones(size)
 
     def logpdf(self, x):
-        if np.ndim(x) == 0:
+        if jnp.ndim(x) == 0:
             if x == self.central_value:
                 return 0.
             else:
-                return -np.inf
-        y = -np.inf*np.ones(np.asarray(x).shape)
-        y[np.asarray(x) == self.central_value] = 0
+                return -jnp.inf
+        y = -jnp.inf*jnp.ones(jnp.asarray(x).shape)
+        y[jnp.asarray(x) == self.central_value] = 0
         return y
 
     def get_error_left(self, *args, **kwargs):
@@ -242,7 +244,7 @@ class NormalDistribution(ProbabilityDistribution):
                '({}, {})'.format(self.central_value, self.standard_deviation)
 
     def get_random(self, size=None):
-        return np.random.normal(self.central_value, self.standard_deviation, size)
+        return jnp.random.normal(self.central_value, self.standard_deviation, size)
 
     def logpdf(self, x):
         return normal_logpdf(x, self.central_value, self.standard_deviation)
@@ -294,7 +296,7 @@ class LogNormalDistribution(ProbabilityDistribution):
         if factor <= 1:
             raise ValueError("Factor must be bigger than 1")
         self.factor = factor
-        self.log_standard_deviation = np.log(factor)
+        self.log_standard_deviation = jnp.log(factor)
         self.log_central_value = math.log(abs(central_value))
         if central_value < 0:
             self.central_sign = -1
@@ -315,27 +317,27 @@ class LogNormalDistribution(ProbabilityDistribution):
 
     def get_random(self, size=None):
         s = self.central_sign
-        return s * np.random.lognormal(self.log_central_value, self.log_standard_deviation, size)
+        return s * jnp.random.lognormal(self.log_central_value, self.log_standard_deviation, size)
 
     def logpdf(self, x):
         s = self.central_sign
-        return scipy.stats.lognorm.logpdf(s * x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+        return scipy.stats.lognorm.logpdf(s * x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
 
     def pdf(self, x):
         s = self.central_sign
-        return scipy.stats.lognorm.pdf(s * x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+        return scipy.stats.lognorm.pdf(s * x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
 
     def cdf(self, x):
         if self.central_sign == -1:
-            return 1 - scipy.stats.lognorm.cdf(-x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+            return 1 - scipy.stats.lognorm.cdf(-x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
         else:
-            return scipy.stats.lognorm.cdf(x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+            return scipy.stats.lognorm.cdf(x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
 
     def ppf(self, x):
         if self.central_sign == -1:
-            return -scipy.stats.lognorm.ppf(1 - x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+            return -scipy.stats.lognorm.ppf(1 - x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
         else:
-            return scipy.stats.lognorm.ppf(x, scale=np.exp(self.log_central_value), s=self.log_standard_deviation)
+            return scipy.stats.lognorm.ppf(x, scale=jnp.exp(self.log_central_value), s=self.log_standard_deviation)
 
     def get_error_left(self, nsigma=1, **kwargs):
         """Return the lower error"""
@@ -384,32 +386,33 @@ class AsymmetricNormalDistribution(ProbabilityDistribution):
         if size is None:
             return self._get_random()
         else:
-            return np.array([self._get_random() for i in range(size)])
+            return jnp.array([self._get_random() for i in range(size)])
 
     def _get_random(self):
-        r = np.random.uniform()
+        r = jnp.random.uniform()
         a = abs(self.left_deviation /
                 (self.right_deviation + self.left_deviation))
         if r > a:
-            x = abs(np.random.normal(0, self.right_deviation))
+            x = abs(jnp.random.normal(0, self.right_deviation))
             return self.central_value + x
         else:
-            x = abs(np.random.normal(0, self.left_deviation))
+            x = abs(jnp.random.normal(0, self.left_deviation))
             return self.central_value - x
 
     def _logpdf(self, x):
         # values of the PDF at the central value
-        if x < self.central_value:
-            # left-hand side: scale factor
-            r = 2 * self.p_right / (self.p_left + self.p_right)
-            return math.log(r) + normal_logpdf(x, self.central_value, self.left_deviation)
-        else:
-            # left-hand side: scale factor
-            r = 2 * self.p_left / (self.p_left + self.p_right)
-            return math.log(r) + normal_logpdf(x, self.central_value, self.right_deviation)
+        leftside = jnp.int32(x < self.central_value)
+        rightside = leftside * (-1) + 1
+        # left-hand side: scale factor
+        r_l = 2 * self.p_right / (self.p_left + self.p_right)
+        logvalue = (math.log(r_l) + normal_logpdf(x, self.central_value, self.left_deviation))*leftside
+        # left-hand side: scale factor
+        r_r = 2 * self.p_left / (self.p_left + self.p_right)
+        logvalue += (math.log(r_r) + normal_logpdf(x, self.central_value, self.right_deviation))*rightside
+        return logvalue
 
     def logpdf(self, x):
-        _lpvect = np.vectorize(self._logpdf)
+        _lpvect = vmap(self._logpdf)
         return _lpvect(x)
 
     def get_error_left(self, nsigma=1, **kwargs):
@@ -450,20 +453,20 @@ class HalfNormalDistribution(ProbabilityDistribution):
                '({}, {})'.format(self.central_value, self.standard_deviation)
 
     def get_random(self, size=None):
-        return self.central_value + np.sign(self.standard_deviation) * abs(np.random.normal(0, abs(self.standard_deviation), size))
+        return self.central_value + jnp.sign(self.standard_deviation) * abs(jnp.random.normal(0, abs(self.standard_deviation), size))
 
     def _logpdf(self, x):
-        if np.sign(self.standard_deviation) * (x - self.central_value) < 0:
-            return -np.inf
+        if jnp.sign(self.standard_deviation) * (x - self.central_value) < 0:
+            return -jnp.inf
         else:
             return math.log(2) + normal_logpdf(x, self.central_value, abs(self.standard_deviation))
 
     def logpdf(self, x):
-        _lpvect = np.vectorize(self._logpdf)
+        _lpvect = jnp.vectorize(self._logpdf)
         return _lpvect(x)
 
     def cdf(self, x):
-        if np.sign(self.standard_deviation) == -1:
+        if jnp.sign(self.standard_deviation) == -1:
             return 1 - scipy.stats.halfnorm.cdf(-x,
                                                 loc=-self.central_value,
                                                 scale=-self.standard_deviation)
@@ -473,7 +476,7 @@ class HalfNormalDistribution(ProbabilityDistribution):
                                             scale=self.standard_deviation)
 
     def ppf(self, x):
-        if np.sign(self.standard_deviation) == -1:
+        if jnp.sign(self.standard_deviation) == -1:
             return -scipy.stats.halfnorm.ppf(1 - x,
                                             loc=-self.central_value,
                                             scale=-self.standard_deviation)
@@ -625,9 +628,9 @@ class GammaDistributionPositive(ProbabilityDistribution):
         else:
             # some iteration necessary as discarding negative values
             # might lead to too small size
-            r = np.array([], dtype=float)
+            r = jnp.array([], dtype=float)
             while len(r) < size:
-                r = np.concatenate((r, self._get_random(size=2*size)))
+                r = jnp.concatenate((r, self._get_random(size=2*size)))
             return r[:size]
 
     def _get_random(self, size):
@@ -637,8 +640,8 @@ class GammaDistributionPositive(ProbabilityDistribution):
     def cdf(self, x):
         cdf0 = self.scipy_dist.cdf(0)
         cdf = (self.scipy_dist.cdf(x) - cdf0)/(1-cdf0)
-        return np.piecewise(
-                    np.asarray(x, dtype=float),
+        return jnp.piecewise(
+            jnp.asarray(x, dtype=float),
                     [x<0, x>=0],
                     [0., cdf]) # return 0 for negative x
 
@@ -648,8 +651,9 @@ class GammaDistributionPositive(ProbabilityDistribution):
 
     def logpdf(self, x):
         # return -inf for negative x values
-        inf0 = np.piecewise(np.asarray(x, dtype=float), [x<0, x>=0], [-np.inf, 0.])
-        return inf0 + self.scipy_dist.logpdf(x) + np.log(self._pdf_scale)
+        inf0 = jnp.piecewise(jnp.asarray(x, dtype=float), [
+                             x < 0, x >= 0], [-jnp.inf, 0.])
+        return inf0 + self.scipy_dist.logpdf(x) + jnp.log(self._pdf_scale)
 
     def _find_error_cdf(self, confidence_level):
         # find the value of the CDF at the position of the left boundary
@@ -768,14 +772,16 @@ class NumericalDistribution(ProbabilityDistribution):
             else:
                 raise ValueError("Central value must be within range provided")
         else:
-            mode = x[np.argmax(y)]
+            mode = x[jnp.argmax(y)]
             super().__init__(central_value=mode, support=(x[0], x[-1]))
-        self.y_norm = y /  np.trapz(y, x=x)  # normalize PDF to 1
-        self.y_norm[self.y_norm < 0] = 0
+        self.y_norm = y / jnp.trapz(y, x=x)  # normalize PDF to 1
+        self.y_norm = jnp.clip(self.y_norm, 0, None)
         self.pdf_interp = interp1d(x, self.y_norm,
                                         fill_value=0, bounds_error=False)
-        _cdf = np.zeros(len(x))
-        _cdf[1:] = np.cumsum(self.y_norm[:-1] * np.diff(x))
+        #_cdf = jnp.zeros(len(x))
+        #_cdf[1:] = jnp.cumsum(self.y_norm[:-1] * jnp.diff(x))
+        _cdf = jnp.cumsum(self.y_norm[:-1] * jnp.diff(x))
+        _cdf = jnp.insert(_cdf, 0, 0)
         _cdf = _cdf/_cdf[-1] # normalize CDF to 1
         self.ppf_interp = interp1d(_cdf, x)
         self.cdf_interp = interp1d(x, _cdf)
@@ -788,7 +794,7 @@ class NumericalDistribution(ProbabilityDistribution):
         """Draw a random number from the distribution.
 
         If size is not None but an integer N, return an array of N numbers."""
-        r = np.random.uniform(size=size)
+        r = jnp.random.uniform(size=size)
         return self.ppf_interp(r)
 
     def ppf(self, x):
@@ -801,9 +807,9 @@ class NumericalDistribution(ProbabilityDistribution):
         return self.pdf_interp(x)
 
     def logpdf(self, x):
-        # ignore warning from log(0)=-np.inf
+        # ignore warning from log(0)=-jnp.inf
         with np.errstate(divide='ignore', invalid='ignore'):
-            return np.log(self.pdf_interp(x))
+            return jnp.log(self.pdf_interp(x))
 
     def _find_error_cdf(self, confidence_level):
         # find the value of the CDF at the position of the left boundary
@@ -841,7 +847,7 @@ class NumericalDistribution(ProbabilityDistribution):
             try:
                 a = self._find_error_cdf(confidence_level(nsigma))
             except ValueError:
-                return np.nan
+                return jnp.nan
             return self.central_value - self.ppf(a)
         else:
             raise ValueError("Method " + str(method) + " unknown")
@@ -868,7 +874,7 @@ class NumericalDistribution(ProbabilityDistribution):
             try:
                 a = self._find_error_cdf(confidence_level(nsigma))
             except ValueError:
-                return np.nan
+                return jnp.nan
             return self.ppf(a + confidence_level(nsigma)) - self.central_value
         else:
             raise ValueError("Method " + str(method) + " unknown")
@@ -877,8 +883,8 @@ class NumericalDistribution(ProbabilityDistribution):
     def from_pd(cls, pd, nsteps=1000):
         if isinstance(pd, NumericalDistribution):
             return pd
-        _x = np.linspace(pd.support[0], pd.support[-1], nsteps)
-        _y = np.exp(pd.logpdf(_x))
+        _x = jnp.linspace(pd.support[0], pd.support[-1], nsteps)
+        _y = jnp.exp(pd.logpdf(_x))
         return cls(central_value=pd.central_value, x=_x, y=_y)
 
 
@@ -988,11 +994,11 @@ class GeneralGammaDistributionPositive(NumericalDistribution):
         # now that we have convolved, cut off anything below x=0
         x = num_unscaled.x
         y = num_unscaled.y_norm
-        y = y[np.where(x >= 0)]
-        x = x[np.where(x >= 0)]
+        y = y[jnp.where(x >= 0)]
+        x = x[jnp.where(x >= 0)]
         if x[0] != 0:  #  make sure the PDF at 0 exists
-            x = np.insert(x, 0, 0.)  # add 0 as first element
-            y = np.insert(y, 0, y[0])  # copy first element
+            x = jnp.insert(x, 0, 0.)  # add 0 as first element
+            y = jnp.insert(y, 0, y[0])  # copy first element
         y[0]
         num_unscaled = NumericalDistribution(x, y)
         x = x * self.scale_factor
@@ -1093,7 +1099,7 @@ class KernelDensityEstimate(NumericalDistribution):
             self.n_bins = min(1000, self.n)
         else:
             self.n_bins = n_bins
-        y, x_edges = np.histogram(data, bins=self.n_bins, density=True)
+        y, x_edges = jnp.histogram(data, bins=self.n_bins, density=True)
         x = (x_edges[:-1] + x_edges[1:])/2.
         self.y_raw = y
         self.raw_dist = NumericalDistribution(x, y)
@@ -1118,7 +1124,7 @@ class GaussianKDE(KernelDensityEstimate):
 
     def __init__(self, data, bandwidth=None, n_bins=None):
         if bandwidth is None:
-            self.bandwidth = len(data)**(-1/5.) * np.std(data)
+            self.bandwidth = len(data)**(-1/5.) * jnp.std(data)
         else:
             self.bandwidth = bandwidth
         super().__init__(data=data,
@@ -1168,34 +1174,39 @@ class MultivariateNormalDistribution(ProbabilityDistribution):
         """
         if covariance is not None:
             self.covariance = covariance
-            self.standard_deviation = np.sqrt(np.diag(self.covariance))
-            self.correlation = self.covariance/np.outer(self.standard_deviation,
+            self.standard_deviation = jnp.sqrt(jnp.diag(self.covariance))
+            self.correlation = self.covariance/jnp.outer(self.standard_deviation,
                                                         self.standard_deviation)
-            np.fill_diagonal(self.correlation, 1.)
+            #https://github.com/google/jax/issues/2680
+            i, j = jnp.diag_indices(min(self.correlation.shape[-2:]))
+            self.correlation = self.correlation.at[..., i, j].set(1.)
+            self.correlation
         else:
             if standard_deviation is None:
                 raise ValueError("You must specify either covariance or standard_deviation")
-            self.standard_deviation = np.array(standard_deviation)
+            self.standard_deviation = jnp.array(standard_deviation)
             if correlation is None:
-                self.correlation = np.eye(len(self.standard_deviation))
+                self.correlation = jnp.eye(len(self.standard_deviation))
             else:
                 if isinstance(correlation, (int, float)):
                     # if it's a number, return delta_ij + (1-delta_ij)*x
                     n_dim = len(central_value)
-                    self.correlation = np.eye(n_dim) + (np.ones((n_dim, n_dim))-np.eye(n_dim))*float(correlation)
+                    self.correlation = jnp.eye(
+                        n_dim) + (jnp.ones((n_dim, n_dim))-jnp.eye(n_dim))*float(correlation)
                 else:
-                    self.correlation = np.array(correlation)
-            self.covariance = np.outer(self.standard_deviation,
+                    self.correlation = jnp.array(correlation)
+            self.covariance = jnp.outer(self.standard_deviation,
                                        self.standard_deviation)*self.correlation
-        super().__init__(central_value, support=np.array([
-                    np.asarray(central_value) - 6*self.standard_deviation,
-                    np.asarray(central_value) + 6*self.standard_deviation
+        super().__init__(central_value, support=jnp.array([
+            jnp.asarray(central_value) - 6*self.standard_deviation,
+            jnp.asarray(central_value) + 6*self.standard_deviation
                     ]))
         # to avoid ill-conditioned covariance matrices, all data are rescaled
         # by the inverse variances
-        self.err = np.sqrt(np.diag(self.covariance))
-        self.scaled_covariance = self.covariance / np.outer(self.err, self.err)
-        assert np.all(np.linalg.eigvals(self.scaled_covariance) >
+        self.err = jnp.sqrt(jnp.diag(self.covariance))
+        self.scaled_covariance = self.covariance / \
+            jnp.outer(self.err, self.err)
+        assert jnp.all(jnp.linalg.eigvals(self.scaled_covariance) >
                       0), "The covariance matrix is not positive definite!" + str(covariance)
 
     def __repr__(self):
@@ -1204,7 +1215,7 @@ class MultivariateNormalDistribution(ProbabilityDistribution):
 
     def get_random(self, size=None):
         """Get `size` random numbers (default: a single one)"""
-        return np.random.multivariate_normal(self.central_value, self.covariance, size)
+        return jnp.random.multivariate_normal(self.central_value, self.covariance, size)
 
     def reduce_dimension(self, exclude=None):
         """Return a different instance where certain dimensions, specified by
@@ -1217,13 +1228,13 @@ class MultivariateNormalDistribution(ProbabilityDistribution):
             return self
         # if parameters are to be excluded, construct a
         # distribution with reduced mean vector and covariance matrix
-        _cent_ex = np.delete(self.central_value, exclude)
-        _cov_ex = np.delete(
-            np.delete(self.covariance, exclude, axis=0), exclude, axis=1)
+        _cent_ex = jnp.delete(self.central_value, exclude)
+        _cov_ex = jnp.delete(
+            jnp.delete(self.covariance, exclude, axis=0), exclude, axis=1)
         if len(_cent_ex) == 1:
             # if only 1 dimension remains, can use a univariate Gaussian
             _dist_ex = NormalDistribution(
-                central_value=_cent_ex[0], standard_deviation=np.sqrt(_cov_ex[0, 0]))
+                central_value=_cent_ex[0], standard_deviation=jnp.sqrt(_cov_ex[0, 0]))
         else:
             # if more than 1 dimension remains, use a (smaller)
             # multivariate Gaussian
@@ -1250,8 +1261,8 @@ class MultivariateNormalDistribution(ProbabilityDistribution):
         # undoing the rescaling of the covariance
         pdf_scaled = scipy.stats.multivariate_normal.logpdf(
             x / self.err, self.central_value / self.err, self.scaled_covariance)
-        sign, logdet = np.linalg.slogdet(self.covariance)
-        return pdf_scaled + (np.linalg.slogdet(self.scaled_covariance)[1] - np.linalg.slogdet(self.covariance)[1]) / 2.
+        sign, logdet = jnp.linalg.slogdet(self.covariance)
+        return pdf_scaled + (jnp.linalg.slogdet(self.scaled_covariance)[1] - jnp.linalg.slogdet(self.covariance)[1]) / 2.
 
     def get_error_left(self, nsigma=1):
         """Return the lower errors"""
@@ -1286,31 +1297,34 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
         """
         for x in xi:
             # check that grid spacings are even up to per mille precision
-            d = np.diff(x)
-            if abs(np.min(d)/np.max(d)-1) > 1e-3:
+            d = jnp.diff(x)
+            if abs(jnp.min(d)/jnp.max(d)-1) > 1e-3:
                 raise ValueError("Grid must be evenly spaced per dimension")
-        self.xi = [np.asarray(x) for x in xi]
-        self.y = np.asarray(y)
+        self.xi = [jnp.asarray(x) for x in xi]
+        self.y = jnp.asarray(y)
         for i, x in enumerate(xi):
             if len(x) == 2:
-                self.xi[i] = np.linspace(x[0], x[1], self.y.shape[i])
+                self.xi[i] = jnp.linspace(x[0], x[1], self.y.shape[i])
         if central_value is not None:
             super().__init__(central_value=central_value,
-                             support=(np.asarray(self.xi).T[0], np.asarray(self.xi).T[-1]))
+                             support=(jnp.asarray(self.xi).T[0], jnp.asarray(self.xi).T[-1]))
         else:
             # if no central value is specified, set it to the mode
-            mode_index = (slice(None),) + np.unravel_index(self.y.argmax(), self.y.shape)
-            mode = np.asarray(np.meshgrid(*self.xi, indexing='ij'))[mode_index]
+            mode_index = (slice(None),) + \
+                jnp.unravel_index(self.y.argmax(), self.y.shape)
+            mode = jnp.asarray(jnp.meshgrid(
+                *self.xi, indexing='ij'))[mode_index]
             super().__init__(central_value=mode, support=None)
-        _bin_volume = np.prod([x[1] - x[0] for x in self.xi])
-        self.y_norm = self.y / np.sum(self.y) / _bin_volume  # normalize PDF to 1
-        # ignore warning from log(0)=-np.inf
-        with np.errstate(divide='ignore', invalid='ignore'):
-            # logy = np.nan_to_num(np.log(self.y_norm))
-            logy = np.log(self.y_norm)
-            logy[np.isneginf(logy)] = -1e100
+        _bin_volume = jnp.prod([x[1] - x[0] for x in self.xi])
+        self.y_norm = self.y / jnp.sum(self.y) / \
+            _bin_volume  # normalize PDF to 1
+        # ignore warning from log(0)=-jnp.inf
+        with jnp.errstate(divide='ignore', invalid='ignore'):
+            # logy = jnp.nan_to_num(jnp.log(self.y_norm))
+            logy = jnp.log(self.y_norm)
+            logy[jnp.isneginf(logy)] = -1e100
             self.logpdf_interp = RegularGridInterpolator(self.xi, logy,
-                                        fill_value=-np.inf, bounds_error=False)
+                                                         fill_value=-jnp.inf, bounds_error=False)
         # the following is needed for get_random: initialize to None
         self._y_flat = None
         self._cdf_flat = None
@@ -1334,7 +1348,7 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
         if size is None:
             return self._get_random()
         else:
-            return np.array([self._get_random() for i in range(size)])
+            return jnp.array([self._get_random() for i in range(size)])
 
     def _get_random(self):
         # if these have not been initialized, do it (once)
@@ -1343,19 +1357,19 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
             self._y_flat = self.y.flatten()
         if self._cdf_flat is None:
             # get the (discrete) 1D CDF
-            _cdf_flat =  np.cumsum(self._y_flat)
+            _cdf_flat = jnp.cumsum(self._y_flat)
             # normalize to 1
             self._cdf_flat = _cdf_flat/_cdf_flat[-1]
         # draw a number between 0 and 1
-        r = np.random.uniform()
+        r = jnp.random.uniform()
         # find the index of the CDF-value closest to r
-        i_r = np.argmin(np.abs(self._cdf_flat-r))
-        indices = np.where(self.y == self._y_flat[i_r])
-        i_bla = np.random.choice(len(indices[0]))
+        i_r = jnp.argmin(jnp.abs(self._cdf_flat-r))
+        indices = jnp.where(self.y == self._y_flat[i_r])
+        i_bla = jnp.random.choice(len(indices[0]))
         index = tuple([a[i_bla] for a in indices])
         xi_r = [ self.xi[i][index[i]] for i in range(len(self.xi)) ]
-        xi_diff = np.array([ X[1]-X[0] for X in self.xi ])
-        return xi_r + np.random.uniform(low=-0.5, high=0.5, size=len(self.xi)) * xi_diff
+        xi_diff = jnp.array([X[1]-X[0] for X in self.xi])
+        return xi_r + jnp.random.uniform(low=-0.5, high=0.5, size=len(self.xi)) * xi_diff
 
     def reduce_dimension(self, exclude=None):
         """Return a different instance where certain dimensions, specified by
@@ -1372,9 +1386,9 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
             exclude = tuple(exclude)
         except TypeError:
             exclude = (exclude,)
-        xi = np.delete(self.xi, tuple(exclude), axis=0)
-        y = np.amax(self.y_norm, axis=tuple(exclude))
-        cv = np.delete(self.central_value, tuple(exclude))
+        xi = jnp.delete(self.xi, tuple(exclude), axis=0)
+        y = jnp.amax(self.y_norm, axis=tuple(exclude))
+        cv = jnp.delete(self.central_value, tuple(exclude))
         if len(xi) == 1:
             # if there is just 1 dimension left, use univariate
             dist = NumericalDistribution(xi[0], y, cv)
@@ -1398,7 +1412,7 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
             # and call its logpdf method
             dist = self.reduce_dimension(exclude=exclude)
             return dist.logpdf(x)
-        if np.asarray(x).shape == (len(self.central_value),):
+        if jnp.asarray(x).shape == (len(self.central_value),):
             # return a scalar
             return self.logpdf_interp(x)[0]
         else:
@@ -1417,11 +1431,12 @@ class MultivariateNumericalDistribution(ProbabilityDistribution):
         if  isinstance(pd, cls):
             # nothing to do
             return pd
-        _xi = np.array([np.linspace(pd.support[0][i], pd.support[-1][i], nsteps)
+        _xi = jnp.array([jnp.linspace(pd.support[0][i], pd.support[-1][i], nsteps)
                         for i in range(len(pd.central_value))])
         ndim = len(_xi)
-        _xlist = np.array(np.meshgrid(*_xi, indexing='ij')).reshape(ndim, nsteps**ndim).T
-        _ylist = np.exp(pd.logpdf(_xlist))
+        _xlist = jnp.array(jnp.meshgrid(*_xi, indexing='ij')
+                           ).reshape(ndim, nsteps**ndim).T
+        _ylist = jnp.exp(pd.logpdf(_xlist))
         _y = _ylist.reshape(tuple(nsteps for i in range(ndim)))
         return cls(central_value=pd.central_value, xi=_xi, y=_y)
 
@@ -1568,9 +1583,9 @@ def _convolve_gaussians(probability_distributions, central_values='same'):
             "Distrubtions must all have the same central value"
     elif central_values == 'sum':
         central_value = sum([p.central_value for p in probability_distributions])
-    sigmas = np.array(
+    sigmas = jnp.array(
         [p.standard_deviation for p in probability_distributions])
-    sigma = math.sqrt(np.sum(sigmas**2))
+    sigma = math.sqrt(jnp.sum(sigmas**2))
     return NormalDistribution(central_value=central_value, standard_deviation=sigma)
 
 
@@ -1585,8 +1600,9 @@ def _convolve_multivariate_gaussians(probability_distributions, central_values='
         assert all(p.central_value == central_value for p in probability_distributions), \
             "Distrubtions must all have the same central value"
     elif central_values == 'sum':
-        central_value = np.sum([p.central_value for p in probability_distributions], axis=0)
-    cov =  np.sum([p.covariance for p in probability_distributions], axis=0)
+        central_value = jnp.sum(
+            [p.central_value for p in probability_distributions], axis=0)
+    cov = jnp.sum([p.covariance for p in probability_distributions], axis=0)
     return MultivariateNormalDistribution(central_value=central_value, covariance=cov)
 
 
@@ -1606,16 +1622,17 @@ def _convolve_numerical(probability_distributions, nsteps=10000, central_values=
     central_diffs = [central_value - p.central_value for p in probability_distributions]
 
     # (shifted appropriately)
-    supports = (np.array([p.support for p in probability_distributions]).T + central_diffs).T
+    supports = (
+        jnp.array([p.support for p in probability_distributions]).T + jnp.array(central_diffs)).T
     support = (central_value - (central_value - supports[:, 0]).sum(),
                central_value - (central_value - supports[:, 1]).sum())
     delta = (support[1] - support[0]) / (nsteps - 1)
-    x = np.linspace(support[0], support[1], nsteps)
+    x = jnp.linspace(support[0], support[1], nsteps)
     # position of the central value
     n_x_central = math.floor((central_value - support[0]) / delta)
     y = None
     for i, pd in enumerate(probability_distributions):
-        y1 = np.exp(pd.logpdf(x - central_diffs[i])) * delta
+        y1 = jnp.exp(pd.logpdf(x - central_diffs[i])) * delta
         if y is None:
             # first step
             y = y1
@@ -1634,28 +1651,29 @@ def _convolve_multivariate_gaussian_numerical(mvgaussian,
     assert isinstance(mvnumerical, MultivariateNumericalDistribution), \
         "mvgaussian must be a single instance of MultivariateNumericalDistribution"
     nsteps = max(200, *[len(x) for x in mvnumerical.xi])
-    xi = np.zeros((len(mvnumerical.xi), nsteps))
+    xi = jnp.zeros((len(mvnumerical.xi), nsteps))
     for i, x in enumerate(mvnumerical.xi):
         # enlarge the support
         cvn = mvnumerical.central_value[i]
         cvg = mvgaussian.central_value[i]
         supp = [s[i] for s in mvgaussian.support]
-        x_max = cvn + (x[-1] - cvn) + (supp[-1] - cvn) +  np.mean(x) - cvg
-        x_min = cvn + (x[0] - cvn) + (supp[0] - cvn) +  np.mean(x) - cvg
-        xi[i] = np.linspace(x_min, x_max, nsteps)
-    xi_grid = np.array(np.meshgrid(*xi, indexing='ij'))
+        x_max = cvn + (x[-1] - cvn) + (supp[-1] - cvn) + jnp.mean(x) - cvg
+        x_min = cvn + (x[0] - cvn) + (supp[0] - cvn) + jnp.mean(x) - cvg
+        xi[i] = jnp.linspace(x_min, x_max, nsteps)
+    xi_grid = jnp.array(jnp.meshgrid(*xi, indexing='ij'))
     # this will transpose from shape (0, 1, 2, ...) to (1, 2, ..., 0)
-    xi_grid = np.transpose(xi_grid, tuple(range(1, xi_grid.ndim)) + (0,))
-    y_num = np.exp(mvnumerical.logpdf(xi_grid))
+    xi_grid = jnp.transpose(xi_grid, tuple(range(1, xi_grid.ndim)) + (0,))
+    y_num = jnp.exp(mvnumerical.logpdf(xi_grid))
     # shift Gaussian to the mean of the support
-    xi_grid = xi_grid - np.array([np.mean(x) for x in xi]) + np.array(mvgaussian.central_value)
-    y_gauss = np.exp(mvgaussian.logpdf(xi_grid))
+    xi_grid = xi_grid - jnp.array([jnp.mean(x)
+                                   for x in xi]) + jnp.array(mvgaussian.central_value)
+    y_gauss = jnp.exp(mvgaussian.logpdf(xi_grid))
     f = scipy.signal.fftconvolve(y_num, y_gauss, mode='same')
     f[f < 0] = 0
     f = f/f.sum()
     if central_values == 'sum':
         # shift back
-        xi = (xi.T + np.array(mvgaussian.central_value)).T
+        xi = (xi.T + jnp.array(mvgaussian.central_value)).T
     return MultivariateNumericalDistribution(xi, f)
 
 
@@ -1731,8 +1749,9 @@ def weighted_average(central_values, standard_deviations):
     """Return the central value and standard deviation of the weighted average
     if a set of normal distributions specified by a list of central values
     and standard deviations"""
-    c = np.average(central_values, weights=1 / np.asarray(standard_deviations)**2)
-    u = np.sqrt(1 / np.sum(1 / np.asarray(standard_deviations)**2))
+    c = jnp.average(central_values, weights=1 /
+                    jnp.asarray(standard_deviations)**2)
+    u = jnp.sqrt(1 / jnp.sum(1 / jnp.asarray(standard_deviations)**2))
     return c, u
 
 
@@ -1753,12 +1772,13 @@ def _combine_numerical(probability_distributions, nsteps=1000):
         return probability_distributions[0]
     assert all(isinstance(p, NumericalDistribution) for p in probability_distributions), \
         "Distributions should all be instances of NumericalDistribution"
-    supports = np.array([p.support for p in probability_distributions])
-    support = (np.max(supports[:, 0]), np.min(supports[:, 1]))
+    supports = jnp.array([p.support for p in probability_distributions])
+    support = (jnp.max(supports[:, 0]), jnp.min(supports[:, 1]))
     if support [1] <= support[0]:
         raise ValueError("Numerical distributions to not have overlapping support")
-    x = np.linspace(support[0], support[1], nsteps)
-    y = np.exp(np.sum([pd.logpdf(x) for pd in probability_distributions], axis=0))
+    x = jnp.linspace(support[0], support[1], nsteps)
+    y = jnp.exp(jnp.sum([pd.logpdf(x)
+                         for pd in probability_distributions], axis=0))
     return NumericalDistribution(x=x, y=y)
 
 
@@ -1803,10 +1823,10 @@ def _combine_multivariate_gaussians(probability_distributions):
     # weigted mean is  Sigma.(W_1.x_1 + W_2.x_2 + ...) = x
     covariances = [d.covariance for d in probability_distributions]
     means = [d.central_value for d in probability_distributions]
-    weights = [np.linalg.inv(c) for c in covariances]
-    weighted_covariance = np.linalg.inv(np.sum(weights, axis=0))
-    weighted_mean = np.dot(weighted_covariance, np.sum(
-        [np.dot(weights[i], means[i]) for i in range(len(means))],
+    weights = [jnp.linalg.inv(c) for c in covariances]
+    weighted_covariance = jnp.linalg.inv(jnp.sum(weights, axis=0))
+    weighted_mean = jnp.dot(weighted_covariance, jnp.sum(
+        [jnp.dot(weights[i], means[i]) for i in range(len(means))],
         axis=0))
     return MultivariateNormalDistribution(weighted_mean,
                                           covariance=weighted_covariance)
@@ -1815,18 +1835,20 @@ def _combine_multivariate_gaussians(probability_distributions):
 def _combine_multivariate_numerical(probability_distributions, nsteps=200):
     assert all(isinstance(p, MultivariateNumericalDistribution) for p in probability_distributions), \
         "Distributions should all be instances of MultivariateNumericalDistribution"
-    supports = np.array([d.support for d  in probability_distributions])
-    xi_min = np.max(supports[:, 0], axis=0)
-    xi_max = np.min(supports[:, 1], axis=0)
-    assert np.all(xi_min < xi_max), \
+    supports = jnp.array([d.support for d in probability_distributions])
+    xi_min = jnp.max(supports[:, 0], axis=0)
+    xi_max = jnp.min(supports[:, 1], axis=0)
+    assert jnp.all(xi_min < xi_max), \
         """Support of the multivariate distributions vanishes."""
     ndim = len(probability_distributions[0].central_value)
-    _xi = np.array([np.linspace(xi_min[i], xi_max[i], nsteps)
+    _xi = jnp.array([jnp.linspace(xi_min[i], xi_max[i], nsteps)
                     for i in range(ndim)])
-    _xlist = np.array(np.meshgrid(*_xi, indexing='ij')).reshape(ndim, nsteps**ndim).T
+    _xlist = jnp.array(jnp.meshgrid(*_xi, indexing='ij')
+                       ).reshape(ndim, nsteps**ndim).T
     from functools import reduce
     import operator
-    _ylist = reduce(operator.mul, [np.exp(d.logpdf(_xlist)) for d in probability_distributions], 1)
+    _ylist = reduce(operator.mul, [jnp.exp(d.logpdf(_xlist))
+                                   for d in probability_distributions], 1)
     _y = _ylist.reshape(tuple(nsteps for i in range(ndim)))
     return MultivariateNumericalDistribution(_xi, _y)
 

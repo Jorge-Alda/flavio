@@ -6,7 +6,7 @@ See arXiv:1503.04849."""
 import flavio
 from flavio.math.functions import li2
 from math import log, pi, sqrt
-import numpy as np
+import jax.numpy as jnp
 
 QL = -1
 QD = -1/3
@@ -177,7 +177,7 @@ def wem_99_HT_low(sh, mb, ml, scale, mc):
               (1518960348015 * sh**4) / 9614649326) * log(mb**2 / ml**2)) /
             (2 * (1 - sh)**2 * sh))
 
-@np.vectorize
+@jnp.vectorize
 def unit_step(x):
     if x >= 0:
         return 1

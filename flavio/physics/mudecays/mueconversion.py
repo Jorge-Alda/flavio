@@ -1,6 +1,6 @@
 import flavio
 from flavio.classes import Observable, Prediction
-import numpy as np
+import jax.numpy as jnp
 from flavio.physics.edms.common import proton_charges
 
 r"""Functions for neutrinoless $\mu - e$ conversion in different target nuclei"""
@@ -26,7 +26,7 @@ def CR_mue(wc_obj, par, nucl):
     #####Conversion Rate obtained from hep-ph/0203110#####
     flavio.citations.register("Kitano:2002mt")
     wc = wc_obj.get_wc('mue', scale, par, nf_out=3)
-    prefac = -np.sqrt(2)/par['GF']
+    prefac = -jnp.sqrt(2)/par['GF']
     AL = prefac / ( 4 * mm ) * wc['Cgamma_emu']
     AR = prefac / ( 4 * mm ) * wc['Cgamma_mue'].conjugate()
     gRV = {

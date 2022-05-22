@@ -1,7 +1,7 @@
 import unittest
 import numpy.testing as npt
 import flavio
-import numpy as np
+import jax.numpy as jnp
 from math import sqrt
 from flavio.classes import Observable, Prediction, Measurement
 from flavio.statistics.probability import NormalDistribution, MultivariateNormalDistribution
@@ -30,7 +30,7 @@ class TestFunctions(unittest.TestCase):
         o = Observable('test_obs')
         o.arguments = ['x']
         m = Measurement('test_obs measurement 1')
-        m.add_constraint([('test_obs', 1)], MultivariateNormalDistribution([1, 2], np.eye(2)))
+        m.add_constraint([('test_obs', 1)], MultivariateNormalDistribution([1, 2], jnp.eye(2)))
         # error: no measurement
         with self.assertRaises(ValueError):
             flavio.combine_measurements('test_obs', x=1, include_measurements=['bla'])
@@ -69,22 +69,22 @@ class TestFunctions(unittest.TestCase):
             return par_dict['m_c']
         Prediction('test_obs 1', f1)
         Prediction('test_obs 2', f2)
-        cov_par = np.array([[0.1**2, 0.1*0.2*0.3], [0.1*0.2*0.3, 0.2**2]])
+        cov_par = jnp.array([[0.1**2, 0.1*0.2*0.3], [0.1*0.2*0.3, 0.2**2]])
         d = flavio.statistics.probability.MultivariateNormalDistribution([4.2, 1.2], covariance=cov_par)
         par = copy.deepcopy(flavio.parameters.default_parameters)
         par.add_constraint(['m_b', 'm_c'], d)
         # test serial
-        np.random.seed(135)
+        jnp.random.seed(135)
         cov = flavio.sm_covariance(['test_obs 1', 'test_obs 2'],
                                    N=1000, par_vary='all', par_obj=par)
         npt.assert_array_almost_equal(cov, cov_par, decimal=2)
         # test parallel
-        np.random.seed(135)
+        jnp.random.seed(135)
         cov_parallel = flavio.sm_covariance(['test_obs 1', 'test_obs 2'],
                                    N=1000, par_vary='all', par_obj=par,
                                    threads=4)
         npt.assert_array_almost_equal(cov, cov_parallel, decimal=6)
-        np.random.seed(135)
+        jnp.random.seed(135)
         cov_1 = flavio.sm_covariance(['test_obs 1'],
                                    N=1000, par_vary='all', par_obj=par)
         # test with single observable

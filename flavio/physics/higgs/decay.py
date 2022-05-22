@@ -19,7 +19,7 @@ def h_gg(C):
           +0.239 * C['dphi_33']
           +0.025 * C['dphi_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_gaga(C):
     r"""Higgs decay to two photons normalized to the SM"""
@@ -37,7 +37,7 @@ def h_gaga(C):
           -0.043 * C['ephi_33']
           -0.008 * C['ephi_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_ww(C):
     r"""Higgs decay to two $W$ bosons normalized to the SM"""
@@ -50,7 +50,7 @@ def h_ww(C):
           -0.167 * C['phil3_11']
           -0.167 * C['phil3_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_zz(C):
     r"""Higgs decay to $Z$ bosons normalized to the SM"""
@@ -62,7 +62,7 @@ def h_zz(C):
           +0.118 * C['phiBox']
           +0.198 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_vv(C):
     r"""Higgs decay to $W$ or $Z$ bosons normalized to the SM"""
@@ -79,7 +79,7 @@ def h_zga(C):
           -14.89 * C['phiW']
           +9.377 * C['phiWB']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_bb(C):
     r"""Higgs decay to two $b$ quarks normalized to the SM"""
@@ -88,7 +88,7 @@ def h_bb(C):
           +0.121 * C['phiBox']
           +0.061 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           -5.05 * C['dphi_33'])
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_cc(C):
     r"""Higgs decay to two charm quarks normalized to the SM"""
@@ -97,7 +97,7 @@ def h_cc(C):
           +0.121 * C['phiBox']
           +0.061 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           -16.49 * C['uphi_22'])
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_tautau(C):
     r"""Higgs decay to two taus normalized to the SM"""
@@ -106,7 +106,7 @@ def h_tautau(C):
           +0.121 * C['phiBox']
           +0.061 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           -11.88 * C['ephi_33'])
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def h_mumu(C):
     r"""Higgs decay to two muons normalized to the SM"""
@@ -115,4 +115,4 @@ def h_mumu(C):
           +0.121 * C['phiBox']
           +0.061 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           -199.8 * C['ephi_22'])
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real

@@ -1,7 +1,7 @@
 import flavio
 from collections import Counter
 import warnings
-import numpy as np
+import jax.numpy as jnp
 import voluptuous as vol
 import pickle
 from flavio.classes import NamedInstanceClass
@@ -246,13 +246,13 @@ class ParameterLikelihood(iio.YAMLLoadable):
     @property
     def get_central(self):
         """Return a numpy array with the central values of all parameters."""
-        return np.asarray([self.parameters_central[p] for p in self.parameters])
+        return jnp.asarray([self.parameters_central[p] for p in self.parameters])
 
     @property
     def get_random(self):
         """Return a numpy array with random values for all parameters."""
         all_random = self.par_obj.get_random_all()
-        return np.asarray([all_random[p] for p in self.parameters])
+        return jnp.asarray([all_random[p] for p in self.parameters])
 
 
 class Likelihood(iio.YAMLLoadable):
@@ -461,17 +461,17 @@ class MeasurementCovariance(object):
             # construct a dict. containing a vector of N random values for
             # each of these observables
             random_dict = m_obj.get_random_all(size=N)
-            random_arr = np.zeros((len(ml.observables), N))
+            random_arr = jnp.zeros((len(ml.observables), N))
             for i, obs in enumerate(ml.observables):
                 if obs in our_obs:
                     random_arr[i] = random_dict[obs]
-            mean = np.mean(random_arr, axis=1)
-            covariance = np.cov(random_arr)
+            mean = jnp.mean(random_arr, axis=1)
+            covariance = jnp.cov(random_arr)
             for i, obs in enumerate(ml.observables):
                 if obs not in our_obs:
                     covariance[:,i] = 0
                     covariance[i, :] = 0
-                    covariance[i, i] = np.inf
+                    covariance[i, i] = jnp.inf
             means.append(mean)
             covariances.append(covariance)
         # if there is only a single measuement
@@ -489,15 +489,15 @@ class MeasurementCovariance(object):
             # weighted covariance is  (W_1 + W_2 + ...)^(-1) = Sigma
             # weigted mean is  Sigma.(W_1.x_1 + W_2.x_2 + ...) = x
             if len(ml.observables) == 1:
-                weights = np.array([1/c for c in covariances])
-                weighted_covariance = 1/np.sum(weights, axis=0)
-                weighted_mean = weighted_covariance * np.sum(
-                                [np.dot(weights[i], means[i]) for i in range(len(means))])
+                weights = jnp.array([1/c for c in covariances])
+                weighted_covariance = 1/jnp.sum(weights, axis=0)
+                weighted_mean = weighted_covariance * jnp.sum(
+                                [jnp.dot(weights[i], means[i]) for i in range(len(means))])
             else:
-                weights = [np.linalg.inv(c) for c in covariances]
-                weighted_covariance = np.linalg.inv(np.sum(weights, axis=0))
-                weighted_mean = np.dot(weighted_covariance, np.sum(
-                                [np.dot(weights[i], means[i]) for i in range(len(means))],
+                weights = [jnp.linalg.inv(c) for c in covariances]
+                weighted_covariance = jnp.linalg.inv(jnp.sum(weights, axis=0))
+                weighted_mean = jnp.dot(weighted_covariance, jnp.sum(
+                                [jnp.dot(weights[i], means[i]) for i in range(len(means))],
                                 axis=0))
             return weighted_mean, weighted_covariance
 
@@ -554,7 +554,7 @@ class MeasurementCovariance(object):
             raise ValueError("Covariance matrix does not contain all necessary entries")
         assert len(permutation) == len(ml.observables), \
             "Covariance matrix does not contain all necessary entries"
-        if np.isscalar(d['central']):
+        if jnp.isscalar(d['central']):
             self._central_cov = (
                 d['central'],
                 d['covariance']
@@ -684,9 +684,9 @@ class FastLikelihood(NamedInstanceClass, iio.YAMLLoadable):
         covariance = cov_exp + cov_sm
         # add the Pseudo-measurement
         m = flavio.classes.Measurement('Pseudo-measurement for FastLikelihood instance: ' + self.name)
-        if np.asarray(central_exp).ndim == 0 or len(central_exp) <= 1: # for a 1D (or 0D) array
+        if jnp.asarray(central_exp).ndim == 0 or len(central_exp) <= 1: # for a 1D (or 0D) array
             m.add_constraint(self.observables,
-                    NormalDistribution(central_exp, np.sqrt(covariance)))
+                    NormalDistribution(central_exp, jnp.sqrt(covariance)))
         else:
             m.add_constraint(self.observables,
                     MultivariateNormalDistribution(central_exp, covariance))

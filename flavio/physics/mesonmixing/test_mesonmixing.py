@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from . import amplitude, observables
 from math import sin, asin, cos, pi
 from flavio.physics.eft import WilsonCoefficients
@@ -22,7 +22,7 @@ wc_K = wc_obj.get_wc('sdsd', 2, par)
 
 # this is the DeltaF=2 evolution matrix from mt to 4.2 GeV as obtained
 # from the formulae in hep-ph/0102316
-U_mb = np.array([[ 0.83693251,  0.        ,  0.        ,  0.        ,  0.        ,
+U_mb = jnp.array([[ 0.83693251,  0.        ,  0.        ,  0.        ,  0.        ,
          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
        [ 0.        ,  0.83693251,  0.        ,  0.        ,  0.        ,
          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
@@ -127,7 +127,7 @@ class TestMesonMixing(unittest.TestCase):
         self.assertAlmostEqual(Observable['S_psiphi'].prediction_central(c, wc_obj), asin(+0.038), places=-1)
 
     def test_running(self):
-        c_in = np.array([ 0.20910694,  0.77740198,  0.54696337,  0.46407456,  0.42482153,
+        c_in = jnp.array([ 0.20910694,  0.77740198,  0.54696337,  0.46407456,  0.42482153,
         0.95717777,  0.62733321,  0.87053086])
         wc = flavio.WilsonCoefficients()
         wc_names = ['C{}_bsbs'.format(i)
@@ -135,8 +135,8 @@ class TestMesonMixing(unittest.TestCase):
         wc_dict = dict(zip(wc_names, c_in))
         wc.set_initial(wc_dict, 173.3)
         c_out_dict = wc.get_wc('sbsb', 4.2, par)
-        c_out = np.array([c_out_dict[k] for k in wc_names])
-        c_out_U = np.dot(U_mb, c_in)
+        c_out = jnp.array([c_out_dict[k] for k in wc_names])
+        c_out_U = jnp.dot(U_mb, c_in)
         for i, r in enumerate(c_out/c_out_U):
             if 'S' in wc_names[i] or 'T' in wc_names[i]:
                 self.assertAlmostEqual(r, 1, delta=0.2,
@@ -149,7 +149,7 @@ class TestMesonMixing(unittest.TestCase):
         par_bju['alpha_s'] = 0.118
         par_bju['m_b'] = 4.4
         c_out_bju_dict = wc.get_wc('sbsb', 2, par_bju, nf_out=5)
-        c_out_bju = np.array([c_out_bju_dict[k] for k in wc_names])
+        c_out_bju = jnp.array([c_out_bju_dict[k] for k in wc_names])
         self.assertAlmostEqual(c_out_bju[0]/c_in[0], 0.788, delta=0.02)
 
     def test_common(self):

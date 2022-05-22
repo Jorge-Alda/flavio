@@ -1,7 +1,7 @@
 """Functions for conversion of quark masses not contained in RunDec."""
 
 from math import log, pi
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.math.functions import zeta
 from flavio.physics.running.masses import zeta
@@ -28,7 +28,7 @@ def fKsFromMs3(Mu, M, Nf):
             -2/3.*Mu**2/M**2*((log(M/(2*Mu))+13/6.)**2+10/9.-pi**2/6.))
 
 def mKS2mMS(M, Nf, asM, Mu, nl):
-    s = np.zeros(4)
+    s = jnp.zeros(4)
     s[0] = 1.
     s[1] = (asM/pi) * fKsFromMs1(Mu, M, Nf)
     s[2] = (asM/pi)**2 * fKsFromMs2(Mu, M, Nf)
@@ -38,7 +38,7 @@ def mKS2mMS(M, Nf, asM, Mu, nl):
 
 def mMS2mKS(MS, Nf, asM, Mu, nl):
     def convert(M):
-        s = np.zeros(4)
+        s = jnp.zeros(4)
         s[0] = 1.
         s[1] = -(asM/pi) * fKsFromMs1(Mu, M, Nf)
         s[2] = -(asM/pi)**2 * fKsFromMs2(Mu, M, Nf)

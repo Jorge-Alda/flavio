@@ -2,7 +2,7 @@ r"""Common functions needed for $B$ decays."""
 
 from math import sqrt,pi,log
 import pkgutil
-import numpy as np
+import jax.numpy as jnp
 from io import StringIO
 import scipy.interpolate
 from flavio.physics.running import running

@@ -1,5 +1,5 @@
 import scipy
-import numpy as np
+import jax.numpy as jnp
 from scipy.optimize import minimize
 
 
@@ -91,6 +91,6 @@ def minimize_migrad(fun, x0, args=(), print_level=0):
     res = scipy.optimize.OptimizeResult()
     res.success = mres.fmin.is_valid
     res.fun = mres.fmin.fval
-    res.x = np.array(mres.values)
+    res.x = jnp.array(mres.values)
     res.nfev = mres.fmin.nfcn
     return res

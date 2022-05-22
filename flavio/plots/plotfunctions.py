@@ -2,7 +2,7 @@ from collections import OrderedDict
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.statistics.functions import delta_chi2, confidence_level
 import scipy.optimize
@@ -58,7 +58,7 @@ def error_budget_pie(err_dict, other_cutoff=0.03):
     if small_frac:
         labels.append('other')
         # the fraction for the "other" errors is obtained by adding them in quadrature
-        fracs.append(np.sqrt(np.sum(np.array(small_frac)**2)))
+        fracs.append(jnp.sqrt(jnp.sum(jnp.array(small_frac)**2)))
     # initially, the fractions had been calculated assuming that they add to
     # one, but adding the "other" errors in quadrature changed that - correct
     # all the fractions to account for this
@@ -95,7 +95,7 @@ def diff_plot_th(obs_name, x_min, x_max, wc=None, steps=100, scale_factor=1, **k
     obs = flavio.classes.Observable[obs_name]
     if not obs.arguments or len(obs.arguments) != 1:
         raise ValueError(r"Only observables that depend on a single parameter are allowed")
-    x_arr = np.arange(x_min, x_max, (x_max-x_min)/(steps-1))
+    x_arr = jnp.arange(x_min, x_max, (x_max-x_min)/(steps-1))
     if wc is None:
         wc = flavio.physics.eft._wc_sm # SM Wilson coefficients
         obs_arr = [flavio.sm_prediction(obs_name, x) for x in x_arr]
@@ -104,7 +104,7 @@ def diff_plot_th(obs_name, x_min, x_max, wc=None, steps=100, scale_factor=1, **k
     ax = plt.gca()
     if 'c' not in kwargs and 'color' not in kwargs:
         kwargs['c'] = 'k'
-    ax.plot(x_arr, scale_factor * np.asarray(obs_arr), **kwargs)
+    ax.plot(x_arr, scale_factor * jnp.asarray(obs_arr), **kwargs)
 
 
 def diff_plot_th_err(obs_name, x_min, x_max, wc=None, steps=100,
@@ -147,9 +147,9 @@ def diff_plot_th_err(obs_name, x_min, x_max, wc=None, steps=100,
     if not obs.arguments or len(obs.arguments) != 1:
         raise ValueError(r"Only observables that depend on a single parameter are allowed")
     step = (x_max-x_min)/(steps-1)
-    x_arr = np.arange(x_min, x_max+step, step)
+    x_arr = jnp.arange(x_min, x_max+step, step)
     step = (x_max-x_min)/(steps_err-1)
-    x_err_arr = np.arange(x_min, x_max+step, step)
+    x_err_arr = jnp.arange(x_min, x_max+step, step)
     # fix to avoid bounds_error in interp1d due to lack of numerical precision
     x_err_arr[-1] = x_arr[-1]
     if wc is None:
@@ -166,13 +166,13 @@ def diff_plot_th_err(obs_name, x_min, x_max, wc=None, steps=100,
         plot_args['label'] = label
     if 'alpha' not in fill_args:
         fill_args['alpha'] = 0.5
-    ax.plot(x_arr, scale_factor * np.asarray(obs_arr), **plot_args)
+    ax.plot(x_arr, scale_factor * jnp.asarray(obs_arr), **plot_args)
     interp_err = scipy.interpolate.interp1d(x_err_arr, obs_err_arr,
                                             kind='quadratic')
     obs_err_arr_int = interp_err(x_arr)
     ax.fill_between(x_arr,
-                    scale_factor * np.asarray(obs_arr - obs_err_arr_int),
-                    scale_factor * np.asarray(obs_arr + obs_err_arr_int),
+                    scale_factor * jnp.asarray(obs_arr - obs_err_arr_int),
+                    scale_factor * jnp.asarray(obs_arr + obs_err_arr_int),
                     **fill_args)
 
 
@@ -318,9 +318,9 @@ def bin_plot_exp(obs_name, col_dict=None, divide_binwidth=False, include_measure
                     # twice in the legend)
                     kwargs_m['label'] = m_obj.experiment
                     _experiment_labels.append(m_obj.experiment)
-            y = scale_factor * np.array(y)
-            dy_lower = scale_factor * np.array(dy_lower)
-            dy_upper = scale_factor * np.array(dy_upper)
+            y = scale_factor * jnp.array(y)
+            dy_lower = scale_factor * jnp.array(dy_lower)
+            dy_upper = scale_factor * jnp.array(dy_upper)
             ax.errorbar(x, y, yerr=[dy_lower, dy_upper], xerr=dx, fmt='.', **kwargs_m)
     return y, bins
 
@@ -403,9 +403,9 @@ def diff_plot_exp(obs_name, col_dict=None, include_measurements=None,
                     # twice in the legend)
                     kwargs_m['label'] = m_obj.experiment
                     _experiment_labels.append(m_obj.experiment)
-            y = scale_factor * np.array(y)
-            dy_lower = scale_factor * np.array(dy_lower)
-            dy_upper = scale_factor * np.array(dy_upper)
+            y = scale_factor * jnp.array(y)
+            dy_lower = scale_factor * jnp.array(dy_lower)
+            dy_upper = scale_factor * jnp.array(dy_upper)
             ax.errorbar(x, y, yerr=[dy_lower, dy_upper], fmt='.', **kwargs_m)
     return y, xs
 
@@ -430,12 +430,12 @@ def density_contour_data(x, y, covariance_factor=None, n_bins=None, n_sigma=(1, 
     """
     if n_bins is None:
         n_bins = min(10*int(sqrt(len(x))), 200)
-    f_binned, x_edges, y_edges = np.histogram2d(x, y, density=True, bins=n_bins)
+    f_binned, x_edges, y_edges = jnp.histogram2d(x, y, density=True, bins=n_bins)
     x_centers = (x_edges[:-1] + x_edges[1:])/2.
     y_centers = (y_edges[:-1] + y_edges[1:])/2.
-    x_mean = np.mean(x_centers)
-    y_mean = np.mean(y_centers)
-    dataset = np.vstack([x, y])
+    x_mean = jnp.mean(x_centers)
+    y_mean = jnp.mean(y_centers)
+    dataset = jnp.vstack([x, y])
 
     d = 2 # no. of dimensions
 
@@ -446,13 +446,13 @@ def density_contour_data(x, y, covariance_factor=None, n_bins=None, n_sigma=(1, 
     else:
         _covariance_factor = covariance_factor
 
-    cov = np.cov(dataset) * _covariance_factor**2
+    cov = jnp.cov(dataset) * _covariance_factor**2
     gaussian_kernel = scipy.stats.multivariate_normal(mean=[x_mean, y_mean], cov=cov)
 
-    x_grid, y_grid = np.meshgrid(x_centers, y_centers)
-    xy_grid = np.vstack([x_grid.ravel(), y_grid.ravel()])
+    x_grid, y_grid = jnp.meshgrid(x_centers, y_centers)
+    xy_grid = jnp.vstack([x_grid.ravel(), y_grid.ravel()])
     f_gauss = gaussian_kernel.pdf(xy_grid.T)
-    f_gauss = np.reshape(f_gauss, (len(x_centers), len(y_centers))).T
+    f_gauss = jnp.reshape(f_gauss, (len(x_centers), len(y_centers))).T
 
     f = scipy.signal.fftconvolve(f_binned, f_gauss, mode='same').T
     f = f/f.sum()
@@ -470,10 +470,10 @@ def density_contour_data(x, y, covariance_factor=None, n_bins=None, n_sigma=(1, 
     # replace negative or zero values by a tiny number before taking the log
     f[f <= 0] = 1e-32
     # convert probability to -2*log(probability), i.e. a chi^2
-    f = -2*np.log(f)
+    f = -2*jnp.log(f)
     # convert levels to chi^2 and make the mode equal chi^2=0
-    levels = list(-2*np.log(levels) - np.min(f))
-    f = f - np.min(f)
+    levels = list(-2*jnp.log(levels) - jnp.min(f))
+    f = f - jnp.min(f)
 
     return {'x': x_grid, 'y': y_grid, 'z': f, 'levels': levels}
 
@@ -503,7 +503,7 @@ def density_contour(x, y, covariance_factor=None, n_bins=None, n_sigma=(1, 2),
     """
     data = density_contour_data(x=x, y=y, covariance_factor=covariance_factor,
                                 n_bins=n_bins, n_sigma=n_sigma)
-    data['z_min'] = np.min(data['z']) # set minimum to prevent warning
+    data['z_min'] = jnp.min(data['z']) # set minimum to prevent warning
     data.update(kwargs) #  since we cannot do **data, **kwargs in Python <3.5
     return contour(**data)
 
@@ -529,19 +529,19 @@ def likelihood_contour_data(log_likelihood, x_min, x_max, y_min, y_max,
     implementation, e.g. from `multiprocess` or `schwimmbad`). Overrides the
     `threads` argument.
     """
-    _x = np.linspace(x_min, x_max, steps)
-    _y = np.linspace(y_min, y_max, steps)
-    x, y = np.meshgrid(_x, _y)
+    _x = jnp.linspace(x_min, x_max, steps)
+    _y = jnp.linspace(y_min, y_max, steps)
+    x, y = jnp.meshgrid(_x, _y)
     if threads == 1:
-        @np.vectorize
+        @jnp.vectorize
         def chi2_vect(x, y): # needed for evaluation on meshgrid
             return -2*log_likelihood([x,y])
         z = chi2_vect(x, y)
     else:
-        xy = np.array([x, y]).reshape(2, steps**2).T
+        xy = jnp.array([x, y]).reshape(2, steps**2).T
         pool = pool or Pool(threads)
         try:
-            z = -2*np.array(pool.map(log_likelihood, xy )).reshape((steps, steps))
+            z = -2*jnp.array(pool.map(log_likelihood, xy )).reshape((steps, steps))
         except PicklingError:
             pool.close()
             raise PicklingError("When using more than 1 thread, the "
@@ -605,9 +605,9 @@ def band_plot(log_likelihood, x_min, x_max, y_min, y_max,
     else:
         contour_kwargs = {}
         nx, ny = kwargs['pre_calculated_z'].shape
-        _x = np.linspace(x_min, x_max, nx)
-        _y = np.linspace(y_min, y_max, ny)
-        x, y = np.meshgrid(_x, _y)
+        _x = jnp.linspace(x_min, x_max, nx)
+        _y = jnp.linspace(y_min, y_max, ny)
+        x, y = jnp.meshgrid(_x, _y)
         contour_kwargs['x'] = x
         contour_kwargs['y'] = y
         contour_kwargs['z'] = kwargs['pre_calculated_z']
@@ -663,8 +663,8 @@ def contour(x, y, z, levels, *, z_min=None,
                       "different from the minimum on the grid. For better "
                       "precision, the actual minimum should be provided in the "
                       "`z_min` argument.")
-        z_min = np.min(z) # use minmum on the grid
-    elif np.min(z) < z_min:
+        z_min = jnp.min(z) # use minmum on the grid
+    elif jnp.min(z) < z_min:
         raise ValueError("The provided minimum `z_min` has to be smaller than "
                          "the smallest `z` value on the grid.")
     z = z - z_min # subtract z minimum to make value of new z minimum 0
@@ -688,7 +688,7 @@ def contour(x, y, z, levels, *, z_min=None,
     _contour_args.update(contour_args)
     _contourf_args.update(contourf_args)
     # for the filling, need to add zero contour
-    zero_contour = min(np.min(z),np.min(levels)*(1-1e-16))
+    zero_contour = min(jnp.min(z),jnp.min(levels)*(1-1e-16))
     levelsf = [zero_contour] + list(levels)
     ax = plt.gca()
     if filled:
@@ -738,13 +738,13 @@ def pdf_plot(dist, x_min=None, x_max=None, fill=True, steps=500, normed=True, **
     """
     _x_min = x_min or dist.support[0]
     _x_max = x_max or dist.support[1]
-    x = np.linspace(_x_min, _x_max, steps)
+    x = jnp.linspace(_x_min, _x_max, steps)
     try:
         y = dist.pdf(x)
     except:
-        y = np.exp(dist.logpdf(x))
+        y = jnp.exp(dist.logpdf(x))
     if normed == 'max':
-        y = y/np.max(y)
+        y = y/jnp.max(y)
     if fill:
         fill_left = dist.central_value - dist.get_error_left(method='hpd')
         fill_right = dist.central_value + dist.get_error_right(method='hpd')
@@ -784,13 +784,13 @@ def likelihood_plot(x, y, fill_x=None, col=None, color=None, label=None, plotarg
         ax.plot(x, y, **_plotargs)
         if fill_x is not None:
             ax.fill_between(x, 0, y,
-                where=np.logical_and(fill_x[0] < x, x < fill_x[1]),
+                where=jnp.logical_and(fill_x[0] < x, x < fill_x[1]),
                 **_fillargs)
     else:
         ax.plot(y, x, **_plotargs)
         if fill_x is not None:
             ax.fill_betweenx(x, 0, y,
-                where=np.logical_and(fill_x[0] < x, x < fill_x[1]),
+                where=jnp.logical_and(fill_x[0] < x, x < fill_x[1]),
                 **_fillargs)
 
 def pvalue_plot(x, y, fill_y=None, col=None, color=None, label=None,

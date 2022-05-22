@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from .bvlnu import *
 from flavio.physics.bdecays.formfactors.b_v import bsz_parameters
 from flavio.physics.eft import WilsonCoefficients

@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from .bllgamma import *
 from flavio.physics.eft import WilsonCoefficients
 from flavio.physics.bdecays.wilsoncoefficients import wctot_dict

@@ -1,4 +1,4 @@
-import numpy as np
+import jax.numpy as jnp
 import json
 import pkgutil
 from flavio.classes import Parameter
@@ -18,16 +18,19 @@ tex_ff = {'f+': 'f_+', 'fT': 'f_T', 'f0': 'f_0', }
 def get_ffpar(filename):
     f = pkgutil.get_data('flavio.physics', filename)
     data = json.loads(f.decode('utf-8'))
-    central = np.array([data['central'][ff].get(a, np.nan) for ff, a in ff_a])
-    unc = np.array([data['uncertainty'][ff].get(a, np.nan) for ff, a in ff_a])
-    corr = np.array([[data['correlation'][ff1 + ff2].get(a1 + a2, np.nan) for ff1, a1 in ff_a] for ff2, a2 in ff_a])
+    central = jnp.array([data['central'][ff].get(a, jnp.nan)
+                         for ff, a in ff_a])
+    unc = jnp.array([data['uncertainty'][ff].get(a, jnp.nan)
+                     for ff, a in ff_a])
+    corr = jnp.array([[data['correlation'][ff1 + ff2].get(a1 + a2, jnp.nan)
+                       for ff1, a1 in ff_a] for ff2, a2 in ff_a])
     # delete the parameter a0_f0, which is instead fixed
     # using the exact kinematical relation f0(0) = f+(0)
     pos_a0_f0 = ff_a.index(('f0', 'a0'))
-    central = np.delete(central, [pos_a0_f0])
-    unc = np.delete(unc, [pos_a0_f0])
-    corr = np.delete(corr, [pos_a0_f0], axis=0)
-    corr = np.delete(corr, [pos_a0_f0], axis=1)
+    central = jnp.delete(central, [pos_a0_f0])
+    unc = jnp.delete(unc, [pos_a0_f0])
+    corr = jnp.delete(corr, [pos_a0_f0], axis=0)
+    corr = jnp.delete(corr, [pos_a0_f0], axis=1)
     return [central, unc, corr]
 
 
@@ -50,7 +53,7 @@ def load_parameters(filename, process, constraints):
             constraints.remove_constraint(parameter_name)
     [central, unc, corr] = get_ffpar(filename)
     constraints.add_constraint(parameter_names,
-        MultivariateNormalDistribution(central_value=central, covariance=np.outer(unc, unc)*corr))
+                               MultivariateNormalDistribution(central_value=central, covariance=jnp.outer(unc, unc)*corr))
 
 
 

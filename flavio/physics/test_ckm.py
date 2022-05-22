@@ -2,7 +2,7 @@ import unittest
 from math import radians,asin,degrees
 import cmath
 from flavio.physics.ckm import *
-import numpy as np
+import jax.numpy as jnp
 
 # some values close to the real ones
 Vus = 0.22
@@ -32,27 +32,27 @@ class TestCKM(unittest.TestCase):
     par_t = dict(Vus=Vus,Vub=Vub,Vcb=Vcb,delta=gamma)
 
     def test_ckm_parametrizations(self):
-        np.testing.assert_almost_equal(self.v_t/self.v_s, np.ones((3,3)), decimal=5)
-        np.testing.assert_almost_equal(self.v_t/self.v_w, np.ones((3,3)), decimal=5)
+        jnp.testing.assert_almost_equal(self.v_t/self.v_s, jnp.ones((3,3)), decimal=5)
+        jnp.testing.assert_almost_equal(self.v_t/self.v_w, jnp.ones((3,3)), decimal=5)
 
     def test_ckm_unitarity(self):
-        np.testing.assert_almost_equal(np.dot(self.v_t,self.v_t.conj().T), np.eye(3), decimal=15)
-        np.testing.assert_almost_equal(np.dot(self.v_w,self.v_w.conj().T), np.eye(3), decimal=15)
-        np.testing.assert_almost_equal(np.dot(self.v_s,self.v_s.conj().T), np.eye(3), decimal=15)
+        jnp.testing.assert_almost_equal(jnp.dot(self.v_t,self.v_t.conj().T), jnp.eye(3), decimal=15)
+        jnp.testing.assert_almost_equal(jnp.dot(self.v_w,self.v_w.conj().T), jnp.eye(3), decimal=15)
+        jnp.testing.assert_almost_equal(jnp.dot(self.v_s,self.v_s.conj().T), jnp.eye(3), decimal=15)
 
     def test_get_ckm(self):
-        # np.testing.assert_array_equal(get_ckm(self.par_s), self.v_s)
-    #     np.testing.assert_array_equal(get_ckm(self.par_w), self.v_w)
-        np.testing.assert_array_equal(get_ckm(self.par_t), self.v_t)
+        # jnp.testing.assert_array_equal(get_ckm(self.par_s), self.v_s)
+    #     jnp.testing.assert_array_equal(get_ckm(self.par_w), self.v_w)
+        jnp.testing.assert_array_equal(get_ckm(self.par_t), self.v_t)
 
     def test_ckm_xi(self):
         # check if xi functions are properly defined
         self.assertEqual(xi_kl_ij(self.par_t, 0, 1, 2, 1),
-                         np.dot(self.v_t[0,2],self.v_t[1,1].conj()))
+                         jnp.dot(self.v_t[0,2],self.v_t[1,1].conj()))
         self.assertEqual(xi('t','bs')(self.par_t),
-                         np.dot(self.v_t[2,2],self.v_t[2,1].conj()))
+                         jnp.dot(self.v_t[2,2],self.v_t[2,1].conj()))
         self.assertEqual(xi('b','cu')(self.par_t),
-                         np.dot(self.v_t[1,2],self.v_t[0,2].conj()))
+                         jnp.dot(self.v_t[1,2],self.v_t[0,2].conj()))
         # make sure illegal flavours raise an error
         with self.assertRaises(KeyError):
             xi('b','sd')

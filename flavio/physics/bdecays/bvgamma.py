@@ -2,7 +2,7 @@ r"""Functions for exclusive $B\to V\gamma$ decays."""
 
 from math import sqrt,pi
 from cmath import exp
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.physics.bdecays.common import meson_quark, meson_ff
 from flavio.physics import ckm, mesonmixing

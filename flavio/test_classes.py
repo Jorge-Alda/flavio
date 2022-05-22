@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.classes import *
 from flavio.statistics.probability import *
@@ -149,10 +149,10 @@ class TestClasses(unittest.TestCase):
         Parameter( 'test_ma' )
         Parameter( 'test_mb' )
         Parameter( 'test_mc' )
-        c2 = np.array([1e-3, 2])
-        c3 = np.array([1e-3, 2, 0.4])
-        cov22 = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
-        cov33 = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3 , 0],[0.2e-3*0.5*0.3, 0.5**2, 0.01], [0, 0.01, 0.1**2]])
+        c2 = jnp.array([1e-3, 2])
+        c3 = jnp.array([1e-3, 2, 0.4])
+        cov22 = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
+        cov33 = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3 , 0],[0.2e-3*0.5*0.3, 0.5**2, 0.01], [0, 0.01, 0.1**2]])
         pdf1 = NormalDistribution(2, 0.5)
         pdf2 = MultivariateNormalDistribution(c2, cov22)
         pdf3 = MultivariateNormalDistribution(c3, cov33)
@@ -217,7 +217,7 @@ class TestClasses(unittest.TestCase):
         # check that the PDF is continuos
         self.assertAlmostEqual( pd.logpdf(1. - eps), pd.logpdf(1. + eps), places=8)
         # check that the PDF is properly normalized
-        self.assertEqual( scipy.integrate.quad(lambda x: math.exp(pd.logpdf(x)), -np.inf, +np.inf)[0], 1)
+        self.assertEqual( scipy.integrate.quad(lambda x: math.exp(pd.logpdf(x)), -jnp.inf, +jnp.inf)[0], 1)
 
     def test_observable_from_function(self):
         o1 = Observable('test_obs_1', arguments=['a1'])

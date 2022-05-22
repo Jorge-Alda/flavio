@@ -1,5 +1,5 @@
 from math import sqrt
-import numpy as np
+import jax.numpy as jnp
 from flavio.physics.bdecays.formfactors.common import z
 from flavio.physics.bdecays.formfactors.b_p.isgurwise import isgur_wise
 
@@ -21,12 +21,12 @@ process_dict['B->pi'] =   {'B': 'B+', 'P': 'pi0'}
 def param_fplusT(mB, mP, a_i, q2, t0=None):
     Z = z(mB, mP, q2, t0)
     n = len(a_i)
-    k = np.arange(n)
+    k = jnp.arange(n)
     return ( a_i * (Z**k - (-1.)**(k - n) * k/n * Z**n) ).sum()
 
 def param_f0(mB, mP, a_i, q2, t0=None):
     Z = z(mB, mP, q2, t0)
-    k = np.arange(len(a_i))
+    k = jnp.arange(len(a_i))
     return ( a_i * Z**k ).sum()
 
 def ff(process, q2, par, n=3, t0=None):

@@ -1,7 +1,7 @@
 r"""Functions for inclusive $B\to X_q\gamma$ decays."""
 
 import flavio
-import numpy as np
+import jax.numpy as jnp
 from math import pi
 from flavio.classes import Observable, Prediction
 
@@ -9,7 +9,7 @@ from flavio.classes import Observable, Prediction
 # (real parts)
 # Mikolaj Misiak, private communication
 # see arXiv:1503.01789 and references therein
-ka1_r = np.array([[0.00289054,-0.0173432,-0.000837297,0.00013955,-0.0158512,-0.101529,0.0913267,-0.00166875],
+ka1_r = jnp.array([[0.00289054,-0.0173432,-0.000837297,0.00013955,-0.0158512,-0.101529,0.0913267,-0.00166875],
                 [-0.0173432,0.104059,0.00502378,-0.000837297,0.0951075,0.609174,-0.54796,0.0100125],
                 [-0.000837297,0.00502378,0.028828,-0.00480467,0.318696,-0.0282896,8.32249,-0.0187533],
                 [0.00013955,-0.000837297,-0.00480467,0.000800779,-0.053116,0.00471493,-1.61065,0.00312556],
@@ -17,7 +17,7 @@ ka1_r = np.array([[0.00289054,-0.0173432,-0.000837297,0.00013955,-0.0158512,-0.1
                 [-0.101529,0.609174,-0.0282896,0.00471493,-0.0840081,1.80697,19.5562,0.108369],
                 [0.0913267,-0.54796,8.32249,-1.61065,122.732,19.5562,5.61819,-0.50728],
                 [-0.00166875,0.0100125,-0.0187533,0.00312556,-0.258893,0.108369,-0.50728,0.452362]])
-ka2_r = np.array([[0.114381,-0.686288,0,0,0,0,9.11217,0.215745],
+ka2_r = jnp.array([[0.114381,-0.686288,0,0,0,0,9.11217,0.215745],
                 [-0.686288,4.11773,0,0,0,0,-8.85918,-1.29447],
                 [0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],
                 [9.11217,-8.85918,0,0,0,0,-37.3173,-13.4112],
@@ -25,7 +25,7 @@ ka2_r = np.array([[0.114381,-0.686288,0,0,0,0,9.11217,0.215745],
 
 # imaginary part of K_{ij}^{(1)}
 # Ayan Paul/HEPfit, private communication
-ka1_i = np.array([[0, 0, -0.007562956672, 0.001260492779, -0.09028834311, 0.0163641251, 0.1092317551, 0.006116280995],
+ka1_i = jnp.array([[0, 0, -0.007562956672, 0.001260492779, -0.09028834311, 0.0163641251, 0.1092317551, 0.006116280995],
                   [0, 0, 0.04537774003, -0.007562956672, 0.5417300587, -0.0981847506, -0.6553905309, -0.03669768597],
                   [0.007562956672, -0.04537774003, 0, 0, 0, 0.2722664402, 1.085982646, 0],
                   [-0.001260492779, 0.007562956672, 0, 0, 0, -0.04537774003, -1.221446177, 0],
@@ -72,12 +72,12 @@ def PE0_BR_BXgamma(wc, par, q, E0):
     at = alphas/4./pi
     coeffs = ['C1_'+bq, 'C2_'+bq, 'C3_'+bq, 'C4_'+bq, 'C5_'+bq, 'C6_'+bq, 'C7eff_'+bq, 'C8eff_'+bq]
     coeffs_p = ['C1p_'+bq, 'C2p_'+bq, 'C3p_'+bq, 'C4p_'+bq, 'C5p_'+bq, 'C6p_'+bq, 'C7effp_'+bq, 'C8effp_'+bq]
-    wc1_8 = np.array([wc[name] for name in coeffs])
-    wc1p_8p = np.array([wc[name] for name in coeffs_p])
-    P1 = at    * np.dot(wc1_8, np.dot(ka1_r, wc1_8.conj())).real
-    P1_p = at    * np.dot(wc1p_8p, np.dot(ka1_r, wc1p_8p.conj())).real
-    P2 = at**2 * np.dot(wc1_8, np.dot(ka2_r, wc1_8.conj())).real
-    P2_p = at**2 * np.dot(wc1p_8p, np.dot(ka2_r, wc1p_8p.conj())).real
+    wc1_8 = jnp.array([wc[name] for name in coeffs])
+    wc1p_8p = jnp.array([wc[name] for name in coeffs_p])
+    P1 = at    * jnp.dot(wc1_8, jnp.dot(ka1_r, wc1_8.conj())).real
+    P1_p = at    * jnp.dot(wc1p_8p, jnp.dot(ka1_r, wc1p_8p.conj())).real
+    P2 = at**2 * jnp.dot(wc1_8, jnp.dot(ka2_r, wc1_8.conj())).real
+    P2_p = at**2 * jnp.dot(wc1p_8p, jnp.dot(ka2_r, wc1p_8p.conj())).real
     Prest = P1 + P2 + P1_p + P2_p
     r_u = flavio.physics.ckm.xi('u',bq)(par)/flavio.physics.ckm.xi('t',bq)(par)
     PVub = -0.0296854 * r_u.real + 0.123411 * abs(r_u)**2
@@ -94,10 +94,10 @@ def PE0_ACP_BXgamma(wc, par, q, E0):
     at = alphas/4./pi
     coeffs = ['C1_'+bq, 'C2_'+bq, 'C3_'+bq, 'C4_'+bq, 'C5_'+bq, 'C6_'+bq, 'C7eff_'+bq, 'C8eff_'+bq]
     coeffs_p = ['C1p_'+bq, 'C2p_'+bq, 'C3p_'+bq, 'C4p_'+bq, 'C5p_'+bq, 'C6p_'+bq, 'C7effp_'+bq, 'C8effp_'+bq]
-    wc1_8 = np.array([wc[name] for name in coeffs])
-    wc1p_8p = np.array([wc[name] for name in coeffs_p])
-    P1 = at    * np.dot(wc1_8, np.dot(ka1_i, wc1_8.conj())).imag
-    P1_p = at    * np.dot(wc1p_8p, np.dot(ka1_i, wc1p_8p.conj())).imag
+    wc1_8 = jnp.array([wc[name] for name in coeffs])
+    wc1p_8p = jnp.array([wc[name] for name in coeffs_p])
+    P1 = at    * jnp.dot(wc1_8, jnp.dot(ka1_i, wc1_8.conj())).imag
+    P1_p = at    * jnp.dot(wc1p_8p, jnp.dot(ka1_i, wc1p_8p.conj())).imag
     r_u = flavio.physics.ckm.xi('u',bq)(par)/flavio.physics.ckm.xi('t',bq)(par)
     PVub = 0.0596211 * r_u.imag
     return P1 + P1_p + PVub

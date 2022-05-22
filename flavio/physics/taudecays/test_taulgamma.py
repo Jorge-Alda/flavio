@@ -1,7 +1,7 @@
 import unittest
 import flavio
 from cmath import exp, pi, sqrt
-import numpy as np
+import jax.numpy as jnp
 from wilson import Wilson
 
 from flavio.physics.taudecays.taulgamma import wcxf_sector_names
@@ -34,41 +34,41 @@ class TestTauLGamma(unittest.TestCase):
         self.assertEqual(flavio.sm_prediction('BR(tau->egamma)'), 0)
     def test_taumugamma_implementation(self):
         input_dict_list=[{
-        'Cgamma_taumu':np.random.random()*1e-8*exp(1j*2*pi*np.random.random()),
-        'Cgamma_mutau':np.random.random()*1e-8*exp(1j*2*pi*np.random.random()),
+        'Cgamma_taumu':jnp.random.random()*1e-8*exp(1j*2*pi*jnp.random.random()),
+        'Cgamma_mutau':jnp.random.random()*1e-8*exp(1j*2*pi*jnp.random.random()),
         } for i in range(10)]
-        BRs = np.array([
+        BRs = jnp.array([
             flavio.np_prediction(
                 'BR(tau->mugamma)',
                 Wilson(input_dict, 100,  'WET', 'flavio')
             )
             for input_dict in input_dict_list
         ])
-        compare_BRs = np.array([
+        compare_BRs = jnp.array([
             compare_BR(
                 Wilson(input_dict, 100,  'WET', 'flavio'),
                 'tau', 'mu',
             )
             for input_dict in input_dict_list
         ])
-        self.assertAlmostEqual(np.max(np.abs(1-BRs/compare_BRs)), 0, delta=0.02)
+        self.assertAlmostEqual(jnp.max(jnp.abs(1-BRs/compare_BRs)), 0, delta=0.02)
     def test_tauegamma_implementation(self):
         input_dict_list=[{
-        'Cgamma_taue':np.random.random()*1e-8*exp(1j*2*pi*np.random.random()),
-        'Cgamma_etau':np.random.random()*1e-8*exp(1j*2*pi*np.random.random()),
+        'Cgamma_taue':jnp.random.random()*1e-8*exp(1j*2*pi*jnp.random.random()),
+        'Cgamma_etau':jnp.random.random()*1e-8*exp(1j*2*pi*jnp.random.random()),
         } for i in range(10)]
-        BRs = np.array([
+        BRs = jnp.array([
             flavio.np_prediction(
                 'BR(tau->egamma)',
                 Wilson(input_dict, 100,  'WET', 'flavio')
             )
             for input_dict in input_dict_list
         ])
-        compare_BRs = np.array([
+        compare_BRs = jnp.array([
             compare_BR(
                 Wilson(input_dict, 100,  'WET', 'flavio'),
                 'tau', 'e',
             )
             for input_dict in input_dict_list
         ])
-        self.assertAlmostEqual(np.max(np.abs(1-BRs/compare_BRs)), 0, delta=0.002)
+        self.assertAlmostEqual(jnp.max(jnp.abs(1-BRs/compare_BRs)), 0, delta=0.002)

@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import flavio
 from flavio.physics.bdecays.bxll import _bxll_dbrdq2, bxll_afb_num_int, bxll_afb_den_int
 

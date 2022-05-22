@@ -18,7 +18,7 @@ def ggF(C):
           +0.239 * C['dphi_33']
           +0.025 * C['dphi_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def hw(C):
     r"""Higgs production associated with a $W$ normalized to the SM"""
@@ -31,7 +31,7 @@ def hw(C):
           +1.85 * C['phiq3_11']
           +0.126 * C['phiq3_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def hz(C):
     r"""Higgs production associated with a $Z$ normalized to the SM"""
@@ -51,7 +51,7 @@ def hz(C):
           +0.028 * C['phiu_22']
           -0.02 * C['phid_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def hv(C):
     r"""Higgs production associated with a $W$ or $Z$ normalized to the SM"""
@@ -73,7 +73,7 @@ def tth(C):
           +0.557 * C['phiG']
           +0.060 * (C['ll_1221'] / 2 - C['phil3_22'] - C['phil3_11'])
           -0.119 * C['uphi_33'])
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real
 
 def vv_h(C):
     r"""Higgs production from vector boson fusion normalized to the SM"""
@@ -93,4 +93,4 @@ def vv_h(C):
           -0.004 * C['phiu_22']
           +0.002 * C['phid_22']
           )
-    return 1 + 1e6 * np.real
+    return 1 + 1e6 * jnp.real

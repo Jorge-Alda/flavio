@@ -2,7 +2,7 @@
 top-level namespace."""
 
 import flavio
-import numpy as np
+import jax.numpy as jnp
 from collections import defaultdict
 from multiprocessing import Pool
 from functools import partial
@@ -66,7 +66,7 @@ def np_uncertainty(obs_name, wc_obj, *args, N=100, threads=1, **kwargs):
     par_random = [{k: v[i] for k, v in par_random.items()} for i in range(N)]
     if threads == 1:
         # not parallel
-        all_pred = np.array([_obs_prediction_par(par, obs_name, wc_obj, *args, **kwargs) for par in par_random])
+        all_pred = jnp.array([_obs_prediction_par(par, obs_name, wc_obj, *args, **kwargs) for par in par_random])
     else:
         # parallel
         pool = Pool(threads)
@@ -75,14 +75,14 @@ def np_uncertainty(obs_name, wc_obj, *args, N=100, threads=1, **kwargs):
         obs_args = flavio.Observable[obs_name].arguments
         for i, a in enumerate(args):
             _kwargs[obs_args[i]] = a
-        all_pred = np.array(
+        all_pred = jnp.array(
                     pool.map(
                         partial(_obs_prediction_par,
                         obs_name=obs_name, wc_obj=wc_obj, **_kwargs),
                         par_random))
         pool.close()
         pool.join()
-    return np.std(all_pred)
+    return jnp.std(all_pred)
 
 def sm_uncertainty(obs_name, *args, N=100, threads=1, **kwargs):
     """Get the uncertainty of the Standard Model prediction of an observable.
@@ -212,7 +212,7 @@ def sm_error_budget(obs_name, *args, N=50, **kwargs):
         return par_tmp
     for p in dependent_par_lists:
         par_random_p = [make_par_random(p, pr) for pr in par_random]
-        all_pred = np.array([
+        all_pred = jnp.array([
             obs.prediction_par(par, wc_sm, *args, **kwargs)
             for par in par_random_p
         ])
@@ -222,7 +222,7 @@ def sm_error_budget(obs_name, *args, N=50, **kwargs):
             key = p[0]
         else:
             key = tuple(p)
-        individual_errors[key] = np.std(all_pred)/abs(pred_central)
+        individual_errors[key] = jnp.std(all_pred)/abs(pred_central)
     return individual_errors
 
 
@@ -232,7 +232,7 @@ def _get_prediction_array_sm(par, obs_list):
         obs_dict = flavio.classes.Observable.argument_format(obs, 'dict')
         obs_obj = flavio.classes.Observable[obs_dict.pop('name')]
         return obs_obj.prediction_par(par, wc_sm, **obs_dict)
-    return np.array([get_prediction_sm(obs, par) for obs in obs_list])
+    return jnp.array([get_prediction_sm(obs, par) for obs in obs_list])
 
 
 def sm_covariance(obs_list, N=100, par_vary='all', par_obj=None, threads=1,
@@ -263,7 +263,7 @@ def sm_covariance(obs_list, N=100, par_vary='all', par_obj=None, threads=1,
 
     def par_random_some(par_random, par_central):
         # take the central values for the parameters not to be varied (N times)
-        par1 = {k: np.full(N, v) for k, v in par_central.items() if k not in par_vary}
+        par1 = {k: jnp.full(N, v) for k, v in par_central.items() if k not in par_vary}
         # take the random values for the parameters to be varied
         par2 = {k: v for k, v in par_random.items() if k in par_vary}
         par1.update(par2)  # merge them
@@ -284,8 +284,8 @@ def sm_covariance(obs_list, N=100, par_vary='all', par_obj=None, threads=1,
         pred_map = pool.map(func_map, par_random)
         pool.close()
         pool.join()
-    all_pred = np.array(list(pred_map))
-    return np.cov(all_pred.T)
+    all_pred = jnp.array(list(pred_map))
+    return jnp.cov(all_pred.T)
 
 
 def combine_measurements(observable, include_measurements=None,
@@ -323,7 +323,7 @@ def combine_measurements(observable, include_measurements=None,
         elif obs not in m.all_parameters:
             continue
         num, constraint = m._parameters[obs]
-        if not np.isscalar(constraint.central_value):
+        if not jnp.isscalar(constraint.central_value):
             _n_multivariate += 1
             # for multivariate PDFs, reduce to 1D PDF
             exclude = tuple([i for i, _ in enumerate(constraint.central_value)

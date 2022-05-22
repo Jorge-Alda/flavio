@@ -1,6 +1,7 @@
 from math import pi
 from cmath import sqrt, log, atan
 import pkgutil
+import jax.numpy as jnp
 import numpy as np
 from io import StringIO
 import scipy.interpolate

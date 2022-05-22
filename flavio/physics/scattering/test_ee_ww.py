@@ -1,10 +1,10 @@
 import unittest
 from flavio import sm_prediction, np_prediction
 import wilson
-import numpy as np
+import jax.numpy as jnp
 
 
-Es = np.array([161.3, 172.1, 182.7, 188.6, 191.6, 195.5, 199.5, 201.6, 204.9, 206.6])
+Es = jnp.array([161.3, 172.1, 182.7, 188.6, 191.6, 195.5, 199.5, 201.6, 204.9, 206.6])
 
 
 class TestEEWW(unittest.TestCase):
@@ -30,13 +30,13 @@ class TestEEWW(unittest.TestCase):
         coeffs = ['phiWB', 'phiD', 'phil3_11', 'phil3_22', 'll_1221', 'phil1_11', 'phie_11']
         for coeff in coeffs:
             for E in [182.66, 189.09, 198.38, 205.92]:
-                _E = Es.flat[np.abs(Es - E).argmin()]
+                _E = Es.flat[jnp.abs(Es - E).argmin()]
                 dsigma = []
                 dsigma_sm = []
                 for i in range(10):
                     args = (E,
-                            np.round(i * 0.2 - 1, 1),
-                            np.round((i + 1)  * 0.2 - 1, 1))
+                            jnp.round(i * 0.2 - 1, 1),
+                            jnp.round((i + 1)  * 0.2 - 1, 1))
                     w = wilson.Wilson({coeff: 0.1 / 246.22**2}, 91.1876, 'SMEFT', 'Warsaw')
                     dsigma.append(np_prediction('<dR/dtheta>(ee->WW)', w, *args))
                     dsigma_sm.append(sm_prediction('<dR/dtheta>(ee->WW)', *args))

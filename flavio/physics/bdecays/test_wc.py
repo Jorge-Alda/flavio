@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from . import wilsoncoefficients
 from .. import eft
 import flavio
@@ -32,7 +32,7 @@ par = {
 
 class TestBWilson(unittest.TestCase):
     def test_wctot(self):
-        wc_low_correct = np.array([ -2.93671059e-01,   1.01676402e+00,  -5.87762813e-03,
+        wc_low_correct = jnp.array([-2.93671059e-01,   1.01676402e+00,  -5.87762813e-03,
         -8.70666812e-02,   4.11098919e-04,   1.10641294e-03,
         -2.95662859e-01,  -1.63048361e-01,   4.11363023e+00,
         -4.19345312e+00,   3.43507549e-03,   1.22202095e-03,
@@ -40,12 +40,15 @@ class TestBWilson(unittest.TestCase):
         wc_obj = eft.WilsonCoefficients()
         wc_low = wilsoncoefficients.wctot_dict(wc_obj, 'bsmumu', 4.2, par)
         wc_names = ['C1_bs', 'C2_bs', 'C3_bs', 'C4_bs', 'C5_bs', 'C6_bs', 'C7_bs', 'C8_bs', 'C9_bsmumu', 'C10_bsmumu', 'C3Q_bs', 'C4Q_bs', 'C5Q_bs', 'C6Q_bs', 'Cb_bs', 'C1p_bs', 'C2p_bs', 'C3p_bs', 'C4p_bs', 'C5p_bs', 'C6p_bs', 'C7p_bs', 'C8p_bs', 'C9p_bsmumu', 'C10p_bsmumu', 'C3Qp_bs', 'C4Qp_bs', 'C5Qp_bs', 'C6Qp_bs', 'Cbp_bs', 'CS_bsmumu', 'CP_bsmumu', 'CSp_bsmumu', 'CPp_bsmumu']
-        wc_low_array = np.asarray([wc_low[key] for key in wc_names])
-        yi = np.array([0, 0, -1/3., -4/9., -20/3., -80/9.])
-        zi = np.array([0, 0, 1, -1/6., 20, -10/3.])
-        wc_low_array[6] = wc_low_array[6] + np.dot(yi, wc_low_array[:6]) # c7eff
-        wc_low_array[7] = wc_low_array[7] + np.dot(zi, wc_low_array[:6]) # c8eff
-        np.testing.assert_almost_equal(wc_low_array[:15], wc_low_correct, decimal=2)
+        wc_low_array = jnp.asarray([wc_low[key] for key in wc_names])
+        yi = jnp.array([0, 0, -1/3., -4/9., -20/3., -80/9.])
+        zi = jnp.array([0, 0, 1, -1/6., 20, -10/3.])
+        wc_low_array[6] = wc_low_array[6] + \
+            jnp.dot(yi, wc_low_array[:6])  # c7eff
+        wc_low_array[7] = wc_low_array[7] + \
+            jnp.dot(zi, wc_low_array[:6])  # c8eff
+        jnp.testing.assert_almost_equal(
+            wc_low_array[:15], wc_low_correct, decimal=2)
 
     def test_C78p(self):
         wc_obj = eft.WilsonCoefficients()

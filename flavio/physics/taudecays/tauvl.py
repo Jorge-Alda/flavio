@@ -3,7 +3,7 @@ r"""Functions for $\tau\to V\ell$."""
 import flavio
 from flavio.physics.taudecays import common
 from math import sqrt, pi
-import numpy as np
+import jax.numpy as jnp
 
 
 # names of LFV sectors in WCxf
@@ -12,7 +12,7 @@ wcxf_sector_names = {('tau', 'mu'): 'mutau',
                      ('mu', 'e'): 'mue', }
 
 def get_wcs(wc, q, lep):
-        return np.array([
+    return jnp.array([
             wc['CVLL_tau{}{}'.format(lep, 2 * q)],
             wc['CVLR_tau{}{}'.format(lep, 2 * q)],
             wc['CVLR_{}tau{}'.format(2 * q, lep)],

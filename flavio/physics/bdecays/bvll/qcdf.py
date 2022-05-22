@@ -3,7 +3,7 @@ r"""QCD factorization corrections to $B\to V\ell^+\ell^-$ at low $q^2$"""
 
 from math import pi,exp
 from cmath import sqrt,atan,log
-import numpy as np
+import jax.numpy as jnp
 from scipy.special import eval_gegenbauer
 from flavio.physics import ckm
 from flavio.math.functions import li2, ei

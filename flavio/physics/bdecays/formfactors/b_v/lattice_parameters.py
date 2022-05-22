@@ -1,6 +1,6 @@
 import pkgutil
 import csv
-import numpy as np
+import jax.numpy as jnp
 from flavio.classes import Parameter
 from flavio.statistics.probability import MultivariateNormalDistribution
 
@@ -29,9 +29,10 @@ def load_parameters(file_res, file_cov, process, constraints):
     keys_sorted = sorted(res_dict.keys())
     res = [res_dict[k] for k in keys_sorted]
     # M -> M + M^T - diag(M) since the dictionary contains only the entries above the diagonal
-    cov = ( np.array([[ cov_dict.get((k,m),0) for m in keys_sorted] for k in keys_sorted])
-          + np.array([[ cov_dict.get((m,k),0) for m in keys_sorted] for k in keys_sorted])
-          - np.diag([ cov_dict[(k,k)] for k in keys_sorted]) )
+    cov = (jnp.array([[cov_dict.get((k, m), 0) for m in keys_sorted] for k in keys_sorted])
+           + jnp.array([[cov_dict.get((m, k), 0)
+                         for m in keys_sorted] for k in keys_sorted])
+           - jnp.diag([cov_dict[(k, k)] for k in keys_sorted]))
     parameter_names = [implementation_name + ' ' + coeff_name for coeff_name in keys_sorted]
     for parameter_name in parameter_names:
         try: # check if parameter object already exists

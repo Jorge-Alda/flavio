@@ -3,7 +3,7 @@
 
 import scipy
 import math
-import numpy as np
+import jax.numpy as jnp
 
 def zeta(x):
     """Riemann Zeta function"""
@@ -23,7 +23,7 @@ def normal_logpdf(x, mu, sigma):
     if isinstance(x, float):
         _x = x
     else:
-        _x = np.asarray(x)
+        _x = jnp.asarray(x)
     return -(_x-mu)**2/sigma**2/2 - math.log(math.sqrt(2*math.pi)*sigma)
 
 def normal_pdf(x, mu, sigma):
@@ -32,5 +32,5 @@ def normal_pdf(x, mu, sigma):
     if isinstance(x, float):
         _x = x
     else:
-        _x = np.asarray(x)
-    return np.exp(-(_x-mu)**2/sigma**2/2)/(np.sqrt(2*math.pi)*sigma)
+        _x = jnp.asarray(x)
+    return jnp.exp(-(_x-mu)**2/sigma**2/2)/(jnp.sqrt(2*math.pi)*sigma)

@@ -2,7 +2,7 @@ import unittest
 from math import sqrt,radians,asin
 from flavio.physics.bdecays.formfactors.b_p import btop, bcl_parameters, bcl, bsz_parameters
 from flavio.physics.bdecays.formfactors.b_v.test_btov import test_eos_ff
-import numpy as np
+import jax.numpy as jnp
 import copy
 from flavio.parameters import default_parameters
 from flavio.classes import Parameter, Implementation

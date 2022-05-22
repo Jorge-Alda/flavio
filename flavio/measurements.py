@@ -5,7 +5,7 @@ import pkgutil
 from flavio.classes import Measurement, Observable
 from flavio._parse_errors import constraints_from_string, errors_from_string
 from flavio.statistics import probability
-import numpy as np
+import jax.numpy as jnp
 from math import sqrt
 import warnings
 
@@ -86,7 +86,8 @@ def _load(obj):
                         squared_error += asym_err[0]*asym_err[1]
                     errors.append(sqrt(squared_error))
             correlation = _fix_correlation_matrix(m_data['correlation'], len(observables))
-            covariance = np.outer(np.asarray(errors), np.asarray(errors))*correlation
+            covariance = jnp.outer(jnp.asarray(
+                errors), jnp.asarray(errors))*correlation
             m.add_constraint(observables, probability.MultivariateNormalDistribution(central_values, covariance))
     return list(measurements.keys())
 
@@ -117,27 +118,27 @@ def _fix_correlation_matrix(corr, n_dim):
         pass
     else:
         # if it's a number, return delta_ij + (1-delta_ij)*x
-        return np.eye(n_dim) + (np.ones((n_dim, n_dim))-np.eye(n_dim))*float(corr)
+        return jnp.eye(n_dim) + (jnp.ones((n_dim, n_dim))-jnp.eye(n_dim))*float(corr)
     if not isinstance(corr, list):
         raise TypeError("Correlation matrix must be of type list")
     if len(corr) != n_dim:
         raise ValueError("The correlation matrix has inappropriate number of dimensions")
-    corr_out = np.zeros((n_dim, n_dim))
+    corr_out = jnp.zeros((n_dim, n_dim))
     for i, line in enumerate(corr):
         if len(line) == n_dim:
             if line[i] != 1:
                 raise ValueError("The correlation matrix must have 1.0 on the diagonal")
-            corr_out[i] = line
+            corr_out.at[i].set(line)
         elif len(line) == n_dim - i:
             if line[0] != 1:
                 raise ValueError("The correlation matrix must have 1.0 on the diagonal")
             corr_out[i,i:] = line
         else:
             raise ValueError("Correlation matrix not understood")
-    if not np.allclose(corr_out, corr_out.T):
+    if not jnp.allclose(corr_out, corr_out.T):
         # if the covariance is not symmetric, it is assumed that only the values above the diagonal are present.
         # then: M -> M + M^T - diag(M)
-        corr_out = corr_out + corr_out.T - np.diag(np.diag(corr_out))
+        corr_out = corr_out + corr_out.T - jnp.diag(jnp.diag(corr_out))
     return corr_out
 
 def write_file(filename, measurements):

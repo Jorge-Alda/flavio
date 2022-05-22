@@ -1,5 +1,5 @@
 from math import sqrt
-import numpy as np
+import jax.numpy as jnp
 from flavio.config import config
 from functools import lru_cache
 
@@ -40,7 +40,7 @@ def w_minus_1_pow_n(z, n, order_z):
 
     The exact expression is $w(z)=(1 + 6 z + z^2)/(-1 + z)^2$.
     """
-    zs = np.array([1, z, z**2, z**3])  # zs[i] = z**i
+    zs = jnp.array([1, z, z**2, z**3])  # zs[i] = z**i
     if order_z > 3:
         raise ValueError("(w-1)^n monomial only implemented until order_z=3.")
     if n > 3:
@@ -48,9 +48,9 @@ def w_minus_1_pow_n(z, n, order_z):
     if n == 0:
         return 1
     if n == 1:
-        a = np.array([0, 8, 16, 24])
+        a = jnp.array([0, 8, 16, 24])
     if n == 2:
-        a = np.array([0, 0, 64, 256])
+        a = jnp.array([0, 0, 64, 256])
     if n == 3:
-        a = np.array([0, 0, 0, 512])
-    return np.sum((a * zs)[:order_z + 1])  # sum_i=0^order_z a[i] * z**i
+        a = jnp.array([0, 0, 0, 512])
+    return jnp.sum((a * zs)[:order_z + 1])  # sum_i=0^order_z a[i] * z**i

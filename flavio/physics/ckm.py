@@ -9,7 +9,7 @@ https://davidmstraub.github.io/ckmutil/
 
 from math import cos,sin
 from cmath import exp,sqrt,phase
-import numpy as np
+import jax.numpy as jnp
 from functools import lru_cache
 from flavio.classes import AuxiliaryQuantity, Implementation
 import ckmutil.ckm
@@ -19,7 +19,8 @@ import ckmutil.ckm
 def ckm_standard(t12, t13, t23, delta):
     return ckmutil.ckm.ckm_standard(t12, t13, t23, delta)
 
-@np.vectorize
+
+@jnp.vectorize
 def tree_to_wolfenstein(Vus, Vub, Vcb, delta):
     return ckmutil.ckm.tree_to_wolfenstein(Vus, Vub, Vcb, delta)
 

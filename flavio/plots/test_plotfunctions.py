@@ -3,7 +3,7 @@ import numpy.testing as npt
 import matplotlib
 import flavio
 from flavio.plots import *
-import numpy as np
+import jax.numpy as jnp
 import scipy.stats
 import warnings
 
@@ -113,7 +113,7 @@ class TestPlots(unittest.TestCase):
             self.assertEqual(z.shape, (30, 30))
 
     def test_density_contour_data(self):
-        np.random.seed(42)
+        jnp.random.seed(42)
         xy = scipy.stats.multivariate_normal(mean=[2,3], cov=[[1,0.5],[0.5,1]]).rvs(size=100)
         data = density_contour_data(*xy.T)
         self.assertEqual(data['x'].shape, (100,100))
@@ -122,7 +122,7 @@ class TestPlots(unittest.TestCase):
         self.assertEqual(len(data['levels']), 2) # by default 2 levels (1, 2sigma)
         self.assertTrue(min(data['levels']) > 0) # levels positive
         self.assertEqual(data['levels'], sorted(data['levels'])) # levels ascending
-        self.assertEqual(np.min(data['z']), 0)
+        self.assertEqual(jnp.min(data['z']), 0)
         # point in the middle should be close to maximum likelihood
         self.assertAlmostEqual(data['z'][50,50], 0, delta=0.1)
         # corners
@@ -134,7 +134,7 @@ class TestPlots(unittest.TestCase):
 
     def test_density_contour(self):
         # just check this works
-        np.random.seed(42)
+        jnp.random.seed(42)
         xy = scipy.stats.multivariate_normal(mean=[2,3], cov=[[1,0.5],[0.5,1]]).rvs(size=100)
         density_contour(*xy.T)
         density_contour_joint(*xy.T)
@@ -148,12 +148,12 @@ class TestPlots(unittest.TestCase):
         self.assertEqual(data['z'].shape, (20,20))
         self.assertEqual(len(data['levels']), 1) # by default, plot 1 sigma contour
         self.assertAlmostEqual(data['levels'][0], 2.3, delta=0.01) #
-        self.assertAlmostEqual(np.min(data['z']), 0.07202216) # keep value of mininum
+        self.assertAlmostEqual(jnp.min(data['z']), 0.07202216) # keep value of mininum
         # test parallel computation
         data2 = likelihood_contour_data(dummy_loglikelihood,
                                         -2, 2, -3, 3, threads=2)
         npt.assert_array_equal(data2['z'], data['z'])
-        # check that `z_min` larger than `np.min(z)` raises error
+        # check that `z_min` larger than `jnp.min(z)` raises error
         with self.assertRaises(ValueError):
             kwargs = {'z_min':0.1}
             kwargs.update(data) #  since we cannot do **data, **kwargs in Python <3.5
@@ -161,6 +161,6 @@ class TestPlots(unittest.TestCase):
 
     def test_smooth_histogram(self):
         # just check this doesn't raise and error
-        np.random.seed(42)
-        dat = np.random.normal(117, 23, size=100)
+        jnp.random.seed(42)
+        dat = jnp.random.normal(117, 23, size=100)
         smooth_histogram(dat, col=1)

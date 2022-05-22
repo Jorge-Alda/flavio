@@ -1,7 +1,7 @@
 """Base classes for `flavio`"""
 
 
-import numpy as np
+import jax.numpy as jnp
 from .config import config
 from collections import OrderedDict, defaultdict
 import copy
@@ -237,7 +237,7 @@ class Constraints(object):
         for parameter, constraints in self._parameters.items():
             num, constraint = constraints
             carr = random_constraints[constraint]
-            if size is None and num == 0 and np.isscalar(carr):
+            if size is None and num == 0 and jnp.isscalar(carr):
                 random_dict[parameter] = carr
             elif size is None and num == 0 and carr.shape == tuple():
                 random_dict[parameter] = carr
@@ -263,8 +263,8 @@ class Constraints(object):
         random_dict_list = [self.get_random_all() for i in range(N)]
         interval_dict = {}
         for k in random_dict_list[0].keys():
-            arr = np.array([r[k] for r in random_dict_list])
-            interval_dict[k] = np.std(arr)
+            arr = jnp.array([r[k] for r in random_dict_list])
+            interval_dict[k] = jnp.std(arr)
         return interval_dict
 
     def get_1d_errors_rightleft(self):
@@ -278,8 +278,8 @@ class Constraints(object):
         for parameter, constraints in self._parameters.items():
             num, constraint = constraints
             idx = ([constraint for constraint, _ in self._constraints]).index(constraint)
-            error_dict[parameter] = (np.ravel([errors_right[idx]])[num],
-                                     np.ravel([errors_left[idx]])[num])
+            error_dict[parameter] = (jnp.ravel([errors_right[idx]])[num],
+                                     jnp.ravel([errors_left[idx]])[num])
         return error_dict
 
     def get_logprobability_single(self, parameter, value, delta=False):

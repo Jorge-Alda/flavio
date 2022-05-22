@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 from .eft import *
 import pkgutil
 from wilson import wcxf
@@ -50,7 +50,7 @@ class TestEFT(unittest.TestCase):
             fwc = WilsonCoefficients()
             fwc.set_initial_wcxf(wc)
             self.assertEqual(fwc.get_wc('sdsd', 120, par, eft=eft)['CVLL_sdsd'], 1j)
-            pf = 4 * par['GF'] / np.sqrt(2)
+            pf = 4 * par['GF'] / jnp.sqrt(2)
             wc = wcxf.WC(eft, 'Bern', 120, {'1dsds': {'Im': 1/pf}})
             fwc = WilsonCoefficients()
             fwc.set_initial_wcxf(wc)

@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import numpy.testing as npt
 import scipy.stats
 from math import pi, sqrt, exp, log
@@ -11,12 +11,12 @@ class TestProbability(unittest.TestCase):
     def test_multiv_normal(self):
         # test that the rescaling of the MultivariateNormalDistribution
         # does not affect the log PDF!
-        c = np.array([1e-3, 2])
-        cov = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
+        c = jnp.array([1e-3, 2])
+        cov = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
         pdf = MultivariateNormalDistribution(c, cov)
-        x=np.array([1.5e-3, 0.8])
+        x=jnp.array([1.5e-3, 0.8])
         num_lpdf = pdf.logpdf(x)
-        ana_lpdf = log(1/sqrt(4*pi**2*np.linalg.det(cov))*exp(-np.dot(np.dot(x-c,np.linalg.inv(cov)),x-c)/2))
+        ana_lpdf = log(1/sqrt(4*pi**2*jnp.linalg.det(cov))*exp(-jnp.dot(jnp.dot(x-c,jnp.linalg.inv(cov)),x-c)/2))
         self.assertAlmostEqual(num_lpdf, ana_lpdf, delta=1e-6)
         self.assertEqual(len(pdf.get_random(10)), 10)
 
@@ -31,9 +31,9 @@ class TestProbability(unittest.TestCase):
         pdf_p_2 = AsymmetricNormalDistribution(1.7, 0.3, 0.0001)
         pdf_n_2 = AsymmetricNormalDistribution(1.7, 0.0001, 0.3)
         self.assertAlmostEqual(pdf_p_1.logpdf(1.99), pdf_p_2.logpdf(1.99), delta=0.001)
-        self.assertEqual(pdf_p_1.logpdf(1.55), -np.inf)
+        self.assertEqual(pdf_p_1.logpdf(1.55), -jnp.inf)
         self.assertAlmostEqual(pdf_n_1.logpdf(1.55), pdf_n_2.logpdf(1.55), delta=0.001)
-        self.assertEqual(pdf_n_1.logpdf(1.99), -np.inf)
+        self.assertEqual(pdf_n_1.logpdf(1.99), -jnp.inf)
         self.assertEqual(len(pdf_p_1.get_random(10)), 10)
         self.assertEqual(len(pdf_p_2.get_random(10)), 10)
         d = HalfNormalDistribution(2, 0.3)
@@ -61,7 +61,7 @@ class TestProbability(unittest.TestCase):
         p1 = GaussianUpperLimit(2*1.78, 0.9544997)
         p2 = HalfNormalDistribution(0, 1.78)
         self.assertAlmostEqual(p1.logpdf(0.237), p2.logpdf(0.237), delta=0.0001)
-        self.assertEqual(p2.logpdf(-1), -np.inf)
+        self.assertEqual(p2.logpdf(-1), -jnp.inf)
         self.assertAlmostEqual(p1.cdf(2*1.78), 0.9544997, delta=0.0001)
 
     def test_gamma(self):
@@ -88,8 +88,8 @@ class TestProbability(unittest.TestCase):
             self.assertEqual(p.central_value, max(loc + 10, 0))
             r = p.get_random(10)
             self.assertEqual(len(r), 10)
-            self.assertTrue(np.min(r) >= 0)
-            self.assertEqual(p.logpdf(-0.1), -np.inf)
+            self.assertTrue(jnp.min(r) >= 0)
+            self.assertEqual(p.logpdf(-0.1), -jnp.inf)
             self.assertEqual(p.cdf(0), 0)
             self.assertAlmostEqual(p.cdf(p.support[1]), 1-2e-9, delta=0.1e-9)
             self.assertAlmostEqual(p.ppf(0), 0, places=14)
@@ -149,7 +149,7 @@ class TestProbability(unittest.TestCase):
 
 
     def test_numerical(self):
-        x = np.arange(-5,7,0.01)
+        x = jnp.arange(-5,7,0.01)
         y = scipy.stats.norm.pdf(x, loc=1)
         y_crazy = 14.7 * y # multiply PDF by crazy number
         p_num = NumericalDistribution(x, y_crazy)
@@ -161,10 +161,10 @@ class TestProbability(unittest.TestCase):
         self.assertEqual(len(p_num.get_random(10)), 10)
 
     def test_multiv_numerical(self):
-        x0 = np.arange(-5,5,0.01)
-        x1 = np.arange(-4,6,0.02)
+        x0 = jnp.arange(-5,5,0.01)
+        x1 = jnp.arange(-4,6,0.02)
         cov = [[0.2**2, 0.5*0.2*0.4], [0.5*0.2*0.4, 0.4**2]]
-        y = scipy.stats.multivariate_normal.pdf(np.array(list(itertools.product(x0, x1))), mean=[0, 1], cov=cov)
+        y = scipy.stats.multivariate_normal.pdf(jnp.array(list(itertools.product(x0, x1))), mean=[0, 1], cov=cov)
         y = y.reshape(len(x0), len(x1))
         y_crazy = 14.7 * y # multiply PDF by crazy number
         p_num = MultivariateNumericalDistribution((x0, x1), y_crazy)
@@ -249,7 +249,7 @@ class TestProbability(unittest.TestCase):
         comb_p_12 = NormalDistribution(12.4, sqrt(0.346**2 + 2.463**2))
         conv_p_123 = _convolve_numerical([p_1, p_2, p_3])
         comb_p_123 = NormalDistribution(12.4, sqrt(0.346**2 + 2.463**2 + 1.397**2))
-        x = np.linspace(2, 20, 10)
+        x = jnp.linspace(2, 20, 10)
         npt.assert_array_almost_equal(conv_p_12.logpdf(x), comb_p_12.logpdf(x), decimal=1)
         npt.assert_array_almost_equal(conv_p_123.logpdf(x), comb_p_123.logpdf(x), decimal=1)
         # same again for addition
@@ -260,14 +260,14 @@ class TestProbability(unittest.TestCase):
         comb_p_12 = NormalDistribution(-970, sqrt(0.346**2 + 2.463**2))
         conv_p_123 = _convolve_numerical([p_1, p_2, p_3], central_values='sum')
         comb_p_123 = NormalDistribution(-863, sqrt(0.346**2 + 2.463**2 + 1.397**2))
-        x = np.linspace(-10, 10, 10)
+        x = jnp.linspace(-10, 10, 10)
         npt.assert_array_almost_equal(conv_p_12.logpdf(x-970), comb_p_12.logpdf(x-970), decimal=1)
         npt.assert_array_almost_equal(conv_p_123.logpdf(x-863), comb_p_123.logpdf(x-863), decimal=1)
 
     def test_convolve_multivariate_gaussian(self):
         from flavio.statistics.probability import _convolve_multivariate_gaussians
-        cov1 = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
-        cov2 = np.array([[0.2**2, 0.5*0.2*0.4], [0.5*0.2*0.4, 0.4**2]])
+        cov1 = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
+        cov2 = jnp.array([[0.2**2, 0.5*0.2*0.4], [0.5*0.2*0.4, 0.4**2]])
         cov12 = cov1 + cov2
         c1 = [2, 5]
         c2 = [-100, -250]
@@ -362,8 +362,8 @@ class TestProbability(unittest.TestCase):
         self.assertAlmostEqual(q.error_left, 0, places=2)
         self.assertAlmostEqual(q.error_right, 0.5, places=2)
         # this does not work (returns nan)
-        self.assertTrue(np.isnan(q.get_error_left(method='hpd')))
-        self.assertTrue(np.isnan(q.get_error_right(method='hpd')))
+        self.assertTrue(jnp.isnan(q.get_error_left(method='hpd')))
+        self.assertTrue(jnp.isnan(q.get_error_right(method='hpd')))
         # this works
         self.assertAlmostEqual(q.get_error_right(method='limit'), 0.5, places=2)
 
@@ -374,17 +374,17 @@ class TestProbability(unittest.TestCase):
         self.assertAlmostEqual(q.error_left, 0.5, places=2)
         self.assertAlmostEqual(q.error_right, 0, places=2)
         # this does not work (returns nan)
-        self.assertTrue(np.isnan(q.get_error_left(method='hpd')))
-        self.assertTrue(np.isnan(q.get_error_right(method='hpd')))
+        self.assertTrue(jnp.isnan(q.get_error_left(method='hpd')))
+        self.assertTrue(jnp.isnan(q.get_error_right(method='hpd')))
         # this works
         self.assertAlmostEqual(q.get_error_left(method='limit'), 0.5, places=2)
         self.assertAlmostEqual(q.get_error_left(method='limit', nsigma=2), 1, places=2)
 
     def test_multivariate_exclude(self):
-        c2 = np.array([1e-3, 2])
-        c3 = np.array([1e-3, 2, 0.4])
-        cov22 = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
-        cov33 = np.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3 , 0],[0.2e-3*0.5*0.3, 0.5**2, 0.01], [0, 0.01, 0.1**2]])
+        c2 = jnp.array([1e-3, 2])
+        c3 = jnp.array([1e-3, 2, 0.4])
+        cov22 = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3],[0.2e-3*0.5*0.3, 0.5**2]])
+        cov33 = jnp.array([[(0.2e-3)**2, 0.2e-3*0.5*0.3 , 0],[0.2e-3*0.5*0.3, 0.5**2, 0.01], [0, 0.01, 0.1**2]])
         pdf1 = NormalDistribution(2, 0.5)
         pdf2 = MultivariateNormalDistribution(c2, cov22)
         pdf3 = MultivariateNormalDistribution(c3, cov33)
@@ -396,26 +396,26 @@ class TestProbability(unittest.TestCase):
 
     def test_gaussian_kde(self):
         # check that a random Gaussian is reproduced correctly
-        np.random.seed(42)
-        dat = np.random.normal(117, 23, size=100)
+        jnp.random.seed(42)
+        dat = jnp.random.normal(117, 23, size=100)
         kde = GaussianKDE(dat)
         norm = scipy.stats.norm(117, 23)
-        x = np.linspace(117-23, 117+23, 10)
-        npt.assert_array_almost_equal(kde.pdf(x)/norm.pdf(x), np.ones(10), decimal=1)
+        x = jnp.linspace(117-23, 117+23, 10)
+        npt.assert_array_almost_equal(kde.pdf(x)/norm.pdf(x), jnp.ones(10), decimal=1)
         # check scott's factor
         self.assertAlmostEqual(kde.bandwidth, 0.4*23, delta=0.4*23*0.1*2)
 
     def test_vectorize(self):
         # check that all logpdf methods work on arrays as well
-        np.random.seed(42)
-        xr = np.random.rand(10)
+        jnp.random.seed(42)
+        xr = jnp.random.rand(10)
         d = UniformDistribution(0, 1)
         self.assertEqual(d.logpdf(xr).shape, (10,))
         d = DeltaDistribution(1)
         lpd = d.logpdf([2,3,4,5,1,1,3,6,1,3,5,1])
-        npt.assert_array_equal(lpd, [-np.inf, -np.inf, -np.inf, -np.inf,
-                                     0, 0, -np.inf, -np.inf, 0,
-                                     -np.inf, -np.inf, 0 ])
+        npt.assert_array_equal(lpd, [-jnp.inf, -jnp.inf, -jnp.inf, -jnp.inf,
+                                     0, 0, -jnp.inf, -jnp.inf, 0,
+                                     -jnp.inf, -jnp.inf, 0 ])
         d = NormalDistribution(0, 1)
         self.assertEqual(d.logpdf(xr).shape, (10,))
         d = AsymmetricNormalDistribution(0, 1, 0.5)
@@ -426,20 +426,20 @@ class TestProbability(unittest.TestCase):
         self.assertEqual(d.logpdf(xr).shape, (10,))
         d = NumericalDistribution.from_pd(NormalDistribution(0, 1))
         self.assertEqual(d.logpdf(xr).shape, (10,))
-        d = MultivariateNormalDistribution([1, 2, 3], np.eye(3))
-        xr3 = np.random.rand(10, 3)
-        xr2 = np.random.rand(10, 2)
+        d = MultivariateNormalDistribution([1, 2, 3], jnp.eye(3))
+        xr3 = jnp.random.rand(10, 3)
+        xr2 = jnp.random.rand(10, 2)
         self.assertEqual(d.logpdf(xr3[0]).shape, ())
         self.assertEqual(d.logpdf(xr3).shape, (10,))
         self.assertEqual(d.logpdf(xr2[0], exclude=(0,)).shape, ())
         self.assertEqual(d.logpdf(xr2, exclude=(0,)).shape, (10,))
         self.assertEqual(d.logpdf(xr[0], exclude=(0, 1)).shape, ())
         self.assertEqual(d.logpdf(xr, exclude=(0, 1)).shape, (10,))
-        xi = [np.linspace(-1,1,5), np.linspace(-1,1,6), np.linspace(-1,1,7)]
-        y = np.random.rand(5,6,7)
+        xi = [jnp.linspace(-1,1,5), jnp.linspace(-1,1,6), jnp.linspace(-1,1,7)]
+        y = jnp.random.rand(5,6,7)
         d = MultivariateNumericalDistribution(xi, y)
-        xr3 = np.random.rand(10, 3)
-        xr2 = np.random.rand(10, 2)
+        xr3 = jnp.random.rand(10, 3)
+        xr2 = jnp.random.rand(10, 2)
         self.assertEqual(d.logpdf(xr3[0]).shape, ())
         self.assertEqual(d.logpdf(xr3).shape, (10,))
         self.assertEqual(d.logpdf(xr2[0], exclude=(0,)).shape, ())
@@ -590,9 +590,9 @@ class TestProbability(unittest.TestCase):
                                         standard_deviation=[1, 2],
                                         correlation=[[1, 0.75], [0.75, 1]])
         for p in [p1, p2]:
-            npt.assert_array_equal(p.covariance, np.array([[1, 1.5], [1.5, 4]]))
-            npt.assert_array_equal(p.standard_deviation, np.array([1, 2]))
-            npt.assert_array_equal(p.correlation, np.array([[1, 0.75], [0.75, 1]]))
+            npt.assert_array_equal(p.covariance, jnp.array([[1, 1.5], [1.5, 4]]))
+            npt.assert_array_equal(p.standard_deviation, jnp.array([1, 2]))
+            npt.assert_array_equal(p.correlation, jnp.array([[1, 0.75], [0.75, 1]]))
         with self.assertRaises(ValueError):
             MultivariateNormalDistribution([0, 0], correlation=[[1, 0.75], [0.75, 1]])
 
@@ -604,11 +604,11 @@ class TestCombineDistributions(unittest.TestCase):
         p_2 = NormalDistribution(4, 0.3)
         p_comb = combine_distributions([p_1, p_2])
         self.assertIsInstance(p_comb, NormalDistribution)
-        s = np.array([0.2, 0.3])
-        c = np.array([5, 4])
+        s = jnp.array([0.2, 0.3])
+        c = jnp.array([5, 4])
         w = 1 / s**2  # weights
-        s_comb = sqrt(1 / np.sum(w))
-        c_comb = np.sum(c * w) / np.sum(w)
+        s_comb = sqrt(1 / jnp.sum(w))
+        c_comb = jnp.sum(c * w) / jnp.sum(w)
         self.assertEqual(p_comb.central_value, c_comb)
         self.assertEqual(p_comb.standard_deviation, s_comb)
 
@@ -628,11 +628,11 @@ class TestCombineDistributions(unittest.TestCase):
         p_2 = NumericalDistribution.from_pd(NormalDistribution(4, 0.3))
         p_comb = combine_distributions([p_1, p_2])
         self.assertIsInstance(p_comb, NumericalDistribution)
-        s = np.array([0.2, 0.3])
-        c = np.array([5, 4])
+        s = jnp.array([0.2, 0.3])
+        c = jnp.array([5, 4])
         w = 1 / s**2  # weights
-        s_comb = sqrt(1 / np.sum(w))
-        c_comb = np.sum(c * w) / np.sum(w)
+        s_comb = sqrt(1 / jnp.sum(w))
+        c_comb = jnp.sum(c * w) / jnp.sum(w)
         self.assertAlmostEqual(p_comb.central_value, c_comb, places=2)
         self.assertAlmostEqual(p_comb.error_left, s_comb, places=2)
         self.assertAlmostEqual(p_comb.error_right, s_comb, places=2)

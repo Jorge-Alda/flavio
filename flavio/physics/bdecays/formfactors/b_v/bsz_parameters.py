@@ -1,4 +1,4 @@
-import numpy as np
+import jax.numpy as jnp
 import json
 import pkgutil
 from flavio.classes import Parameter
@@ -18,17 +18,17 @@ tex_ff = {'A0': 'A_0', 'A1': 'A_1', 'A12': r'A_{12}', 'V': 'V', 'T1': 'T_1', 'T2
 def get_ffpar(filename):
     f = pkgutil.get_data('flavio.physics', filename)
     data = json.loads(f.decode('utf-8'))
-    central = np.array([data['central'][ff].get(a, np.nan) for ff, a in ff_a])
-    unc = np.array([data['uncertainty'][ff].get(a, np.nan) for ff, a in ff_a])
-    corr = np.array([[data['correlation'][ff1 + ff2].get(a1 + a2, np.nan) for ff1, a1 in ff_a] for ff2, a2 in ff_a])
+    central = jnp.array([data['central'][ff].get(a, jnp.nan) for ff, a in ff_a])
+    unc = jnp.array([data['uncertainty'][ff].get(a, jnp.nan) for ff, a in ff_a])
+    corr = jnp.array([[data['correlation'][ff1 + ff2].get(a1 + a2, jnp.nan) for ff1, a1 in ff_a] for ff2, a2 in ff_a])
     # delete the parameters a0_A12 and a0_T1, which are instead fixed
     # using the exact kinematical relations, cf. eq. (16) of arXiv:1503.05534
     pos_a0_A12 = ff_a.index(('A12', 'a0'))
     pos_a0_T2 = ff_a.index(('T2', 'a0'))
-    central = np.delete(central, [pos_a0_A12, pos_a0_T2])
-    unc = np.delete(unc, [pos_a0_A12, pos_a0_T2])
-    corr = np.delete(corr, [pos_a0_A12, pos_a0_T2], axis=0)
-    corr = np.delete(corr, [pos_a0_A12, pos_a0_T2], axis=1)
+    central = jnp.delete(central, [pos_a0_A12, pos_a0_T2])
+    unc = jnp.delete(unc, [pos_a0_A12, pos_a0_T2])
+    corr = jnp.delete(corr, [pos_a0_A12, pos_a0_T2], axis=0)
+    corr = jnp.delete(corr, [pos_a0_A12, pos_a0_T2], axis=1)
     return [central, unc, corr]
 
 
@@ -52,7 +52,7 @@ def load_parameters(filename, process, constraints):
             constraints.remove_constraint(parameter_name)
     [central, unc, corr] = get_ffpar(filename)
     constraints.add_constraint(parameter_names,
-        MultivariateNormalDistribution(central_value=central, covariance=np.outer(unc, unc)*corr))
+        MultivariateNormalDistribution(central_value=central, covariance=jnp.outer(unc, unc)*corr))
 
 
 # Resonance masses used in arXiv:1503.05534

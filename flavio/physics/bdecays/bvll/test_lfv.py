@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import jax.numpy as jnp
 import flavio
 
 wc_sm = flavio.physics.eft.WilsonCoefficients()
