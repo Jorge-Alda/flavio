@@ -88,6 +88,7 @@ implementation:
   Bs->K* form factor: Bs->K* BSZ3
   Bs->phi form factor: Bs->phi BSZ3
   B->D* form factor: B->D* CLN
+  Bc->J/psi form factor: Bc->J/psi HDL
 
   # B->P form factors
   B->K form factor: B->K BSZ3

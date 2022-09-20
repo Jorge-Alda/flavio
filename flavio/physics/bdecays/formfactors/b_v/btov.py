@@ -1,9 +1,9 @@
-from flavio.physics.bdecays.formfactors.b_v import bsz, sse, cln, clnexp
+from flavio.physics.bdecays.formfactors.b_v import bsz, sse, cln, clnexp, hdl
 from flavio.classes import AuxiliaryQuantity, Implementation
 from flavio.config import config
 
 processes_H2L = ['B->K*', 'B->rho', 'B->omega', 'Bs->phi', 'Bs->K*']  # heavy to light
-processes_H2H = ['B->D*', ]  # heavy to heavy
+processes_H2H = ['B->D*', 'Bc->J/psi', ]  # heavy to heavy
 
 
 def ff_function(function, process, **kwargs):
@@ -44,3 +44,10 @@ for p in processes_H2H:
     i.set_description("CLN-like parametrization as used by B factories"
                       " and using improved Isgur-Wise relations"
                       " for the tensor form factors")
+
+    iname = p + ' HDL'
+    i = Implementation(name=iname, quantity=quantity,
+                       function=ff_function(hdl.ff, p))
+    i.set_description("HDL parametrization, simplified version"
+                      " of the BLG parametrization."
+                      " (see arXiv:2007.06957)")

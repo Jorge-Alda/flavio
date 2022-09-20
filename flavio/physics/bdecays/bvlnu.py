@@ -532,6 +532,7 @@ _hadr = {
 'B+->rho': {'tex': r"B^+\to \rho^0", 'B': 'B+', 'V': 'rho0', },
 'B+->omega': {'tex': r"B^+\to \omega ", 'B': 'B+', 'V': 'omega', },
 'Bs->K*': {'tex': r"B_s\to K^{* -} ", 'B': 'Bs', 'V': 'K*+', },
+    'Bc->J/psi': {'tex': r"B_c\to J/\psi", 'B': 'Bc', 'V': 'J/psi', }
 }
 # for LF ratios we don't distinguish B+ and B0 (but take B0 because we have to choose sth)
 _hadr_l = {
@@ -539,6 +540,7 @@ _hadr_l = {
 'B->rho': {'tex': r"B\to \rho", 'B': 'B0', 'V': 'rho+', 'decays': ['B0->rho', 'B+->rho'],},
 'B+->omega': {'tex': r"B^+\to \omega ", 'B': 'B+', 'V': 'omega', 'decays': ['B+->omega'],},
 'Bs->K*': {'tex': r"B_s\to K^{* -} ", 'B': 'Bs', 'V': 'K*+', 'decays': ['Bs->K*'],},
+    'Bc->J/psi': {'tex': r"B_c\to J/\psi", 'B': 'Bc', 'V': 'J/psi', 'decays': ['Bc->J/psi']}
 }
 
 _process_taxonomy = r'Process :: $b$ hadron decays :: Semi-leptonic tree-level decays :: $B\to V\ell\nu$ :: $'

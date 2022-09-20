@@ -1889,3 +1889,123 @@ Lambda->p f_1(0):
 Lambda->p g_1(0):
   tex: $g_1(0)$
   description: $\Lambda\to p$ axial vector form factor $g_1$ at $q^2=0$
+
+# Parameters for Bc->J/psi form factors in the BSZ or BCL parametrization
+Bc->J/psi HDL m0 p0:
+  tex: $m_{B_c^*}^{A_0}$
+  description: Resonance mass for the $B_c\to J/\psi$ scalar form factor in BCL or BSZ parametrization
+Bc->J/psi HDL m0 p1:
+  tex: $m_{B_c^*}^{A_0}$
+  description: Resonance mass for the $B_c\to J/\psi$ scalar form factor in BCL or BSZ parametrization
+Bc->J/psi HDL m0 p2:
+  tex: $m_{B_c^*}^{A_0}$
+  description: Resonance mass for the $B_c\to J/\psi$ scalar form factor in BCL or BSZ parametrization
+Bc->J/psi HDL m1- p0:
+  tex: $m_{B_c^*}^{1^-}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $V$ and $T_1$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1- p1:
+  tex: $m_{B_c^*}^{1^-}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $V$ and $T_1$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1- p2:
+  tex: $m_{B_c^*}^{1^-}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $V$ and $T_1$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1- p3:
+  tex: $m_{B_c^*}^{1^-}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $V$ and $T_1$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1+ p0:
+  tex: $m_{B_c^*}^{1^+}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $A_{12}$ and $T_{2,23}$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1+ p1:
+  tex: $m_{B_c^*}^{1^+}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $A_{12}$ and $T_{2,23}$ in BCL or BSZ parametrization
+Bc->J/psi HDL m1+ p2:
+  tex: $m_{B_c^*}^{1^+}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $A_{12}$ and $T_{2,23}$ in BCL or BSZ parametrization 
+Bc->J/psi HDL m1+ p3:
+  tex: $m_{B_c^*}^{1^+}$
+  description: Resonance mass for the $B_c\to J/\psi$ form factors $A_{12}$ and $T_{2,23}$ in BCL or BSZ parametrization
+  # Parameters for D->K form factors in the BSZ parametrization
+Bc->J/psi HDL a0_A0:
+  tex: $a_0^{A_0}$
+  description: HDL form factor parametrization coefficient $a_0$ of $A_0$
+Bc->J/psi HDL a1_A0:
+  tex: $a_1^{A_0}$
+  description: HDL form factor parametrization coefficient $a_1$ of $A_0$
+Bc->J/psi HDL a2_A0:
+  tex: $a_2^{A_0}$
+  description: HDL form factor parametrization coefficient $a_2$ of $A_0$
+Bc->J/psi HDL a3_A0:
+  tex: $a_3^{A_0}$
+  description: HDL form factor parametrization coefficient $a_3$ of $A_0$
+Bc->J/psi HDL a0_A1:
+  tex: $a_0^{A_1}$
+  description: HDL form factor parametrization coefficient $a_0$ of $A_1$
+Bc->J/psi HDL a1_A1:
+  tex: $a_1^{A_1}$
+  description: HDL form factor parametrization coefficient $a_1$ of $A_1$
+Bc->J/psi HDL a2_A1:
+  tex: $a_2^{A_1}$
+  description: HDL form factor parametrization coefficient $a_2$ of $A_1$
+Bc->J/psi HDL a3_A1:
+  tex: $a_3^{A_1}$
+  description: HDL form factor parametrization coefficient $a_3$ of $A_1$
+Bc->J/psi HDL a0_A2:
+  tex: $a_0^{A_2}$
+  description: HDL form factor parametrization coefficient $a_0$ of $A_2$
+Bc->J/psi HDL a1_A2:
+  tex: $a_1^{A_2}$
+  description: HDL form factor parametrization coefficient $a_1$ of $A_2$
+Bc->J/psi HDL a2_A2:
+  tex: $a_2^{A_2}$
+  description: HDL form factor parametrization coefficient $a_2$ of $A_2$
+Bc->J/psi HDL a3_A2:
+  tex: $a_3^{A_2}$
+  description: HDL form factor parametrization coefficient $a_3$ of $A_2$
+Bc->J/psi HDL a0_V:
+  tex: $a_0^{V}$
+  description: HDL form factor parametrization coefficient $a_0$ of $V$
+Bc->J/psi HDL a1_V:
+  tex: $a_1^{V}$
+  description: HDL form factor parametrization coefficient $a_1$ of $V$
+Bc->J/psi HDL a2_V:
+  tex: $a_2^{V}$
+  description: HDL form factor parametrization coefficient $a_2$ of $V$
+Bc->J/psi HDL a3_V:
+  tex: $a_3^{V}$
+  description: HDL form factor parametrization coefficient $a_3$ of $V$
+Bc->J/psi HDL a0_T1:
+  tex: $a_0^{T_1}$
+  description: HDL form factor parametrization coefficient $a_0$ of $T_1$
+Bc->J/psi HDL a1_T1:
+  tex: $a_1^{T_1}$
+  description: HDL form factor parametrization coefficient $a_1$ of $T_1$
+Bc->J/psi HDL a2_T1:
+  tex: $a_2^{T_1}$
+  description: HDL form factor parametrization coefficient $a_2$ of $T_1$
+Bc->J/psi HDL a3_T1:
+  tex: $a_3^{T_1}$
+  description: HDL form factor parametrization coefficient $a_3$ of $T_1$
+Bc->J/psi HDL a0_T2:
+  tex: $a_0^{T_2}$
+  description: HDL form factor parametrization coefficient $a_0$ of $T_2$
+Bc->J/psi HDL a1_T2:
+  tex: $a_1^{T_2}$
+  description: HDL form factor parametrization coefficient $a_1$ of $T_2$
+Bc->J/psi HDL a2_T2:
+  tex: $a_2^{T_2}$
+  description: HDL form factor parametrization coefficient $a_2$ of $T_2$
+Bc->J/psi HDL a3_T2:
+  tex: $a_3^{T_2}$
+  description: HDL form factor parametrization coefficient $a_3$ of $T_2$
+Bc->J/psi HDL a0_T3:
+  tex: $a_0^{T_3}$
+  description: HDL form factor parametrization coefficient $a_0$ of $T_3$
+Bc->J/psi HDL a1_T3:
+  tex: $a_1^{T_3}$
+  description: HDL form factor parametrization coefficient $a_1$ of $T_3$
+Bc->J/psi HDL a2_T3:
+  tex: $a_2^{T_3}$
+  description: HDL form factor parametrization coefficient $a_2$ of $T_3$
+Bc->J/psi HDL a3_T3:
+  tex: $a_3^{T_3}$
+  description: HDL form factor parametrization coefficient $a_3$ of $T_3$

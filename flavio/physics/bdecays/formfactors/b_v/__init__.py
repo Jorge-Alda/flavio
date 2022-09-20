@@ -8,3 +8,4 @@ from . import clnexp
 from . import isgurwise
 from . import lattice_parameters
 from . import sse
+from . import hdl
