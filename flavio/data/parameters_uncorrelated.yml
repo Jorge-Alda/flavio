@@ -425,3 +425,18 @@ D->pi BSZ a2_fT: 0
 D->K BSZ a0_fT: 0.687(54)
 D->K BSZ a1_fT: 0.10(1)
 D->K BSZ a2_fT: 0
+
+
+# Parameters fot Bc->J/psi form factors in the HDL parametrization
+# arXiv:2007.06957, arXiv:2204.04357
+Bc->J/psi HDL m0 p0: 6.275
+Bc->J/psi HDL m0 p1: 6.872
+Bc->J/psi HDL m0 p2: 7.25
+Bc->J/psi HDL m1- p0: 6.335
+Bc->J/psi HDL m1- p1: 6.926
+Bc->J/psi HDL m1- p2: 7.02
+Bc->J/psi HDL m1- p3: 7.28
+Bc->J/psi HDL m1+ p0: 6.745
+Bc->J/psi HDL m1+ p1: 6.75
+Bc->J/psi HDL m1+ p2: 7.15
+Bc->J/psi HDL m1+ p3: 7.15

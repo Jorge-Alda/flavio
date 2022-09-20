@@ -40,6 +40,7 @@ meson_quark = {
 ('Bs','phi'): 'bs',
 ('B','Xs'): 'bs',
 ('B','Xd'): 'bd',
+    ('Bc', 'J/psi'): 'bc',
 'Bs': 'bs',
 'B0': 'bd',
 'B+': 'bu',
@@ -90,4 +91,5 @@ meson_ff = {
 ('B+','pi0'): 'B->pi',
 ('B0','pi0'): 'B->pi',
 ('B+','pi+'): 'B->pi',
+    ('Bc', 'J/psi'): 'Bc->J/psi',
 }
