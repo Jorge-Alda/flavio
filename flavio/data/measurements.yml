@@ -13997,3 +13997,9 @@ LEP ee->WW angular:
       thetamin: 0.8
       thetamax: 1.0
       value: 7.584 ± 0.26
+
+LHCb R(J/psi) 2017:
+  experiment: LHCb
+  inspire: LHCb:2017vlu
+  values:
+    Rtaumu(Bc->J/psilnu): 0.71 ± 0.17 ± 0.18
