@@ -128,6 +128,7 @@ _hadr = {
 'B+->K*': {'tex': r"B^+\to K^{*+}", 'B': 'B+', 'V': 'K*+', },
 'B+->rho': {'tex': r"B^+\to \rho^{+}", 'B': 'B+', 'V': 'rho+', },
 'B0->rho': {'tex': r"B^0\to \rho^{0}", 'B': 'B0', 'V': 'rho0', },
+    'Bs->phi': {'tex': r"B_s\to \phi ", 'B': 'Bs', 'V': 'phi', },
 }
 
 for M in _hadr.keys():
@@ -159,7 +160,7 @@ for M in _hadr.keys():
     _obs.add_taxonomy(_process_taxonomy + _process_tex + r"$")
     flavio.classes.Prediction(_obs_name, BRtot_summed(_hadr[M]['B'], _hadr[M]['V']))
 
-    if 'K*' in M: # FL only implemented for K*
+    if 'K*' in M or 'phi' in M:  # FL only implemented for K*
 
         # binned FL
         _obs_name = "<FL>("+M+"nunu)"
