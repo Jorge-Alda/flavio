@@ -14003,3 +14003,9 @@ LHCb R(J/psi) 2017:
   inspire: LHCb:2017vlu
   values:
     Rtaumu(Bc->J/psilnu): 0.71 ± 0.17 ± 0.18
+
+DELPHI Bs->phinunu 1996:
+  experiment: DELPHI
+  inspire: DELPHI:1996ohp
+  values:
+    BR(Bs->phinunu): < 5.4e-3 @ 90% CL
