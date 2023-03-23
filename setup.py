@@ -30,8 +30,8 @@ setup(name='flavio',
                 'physics/data/wcsm/*',
                 ]
       },
-      install_requires=['numpy>=1.16.5', 'scipy', 'setuptools>=3.3', 'pyyaml',
-                        'ckmutil', 'wilson>=2.0', 'particle>=0.16.0', ],
+      install_requires=['numpy>=1.20.0', 'scipy', 'setuptools>=3.3', 'pyyaml',
+                        'ckmutil', 'wilson>=2.0', 'particle>=0.16.0', 'parton>=0.2.1', ],
       extras_require={
             'testing': ['nose2'],
             'plotting': ['matplotlib>=2.0'],
