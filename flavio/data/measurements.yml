@@ -29780,7 +29780,7 @@ Belle-II B0->D*lnu angular 2023:
       q2min: 0
       q2max: 4.85
       value: 0.020 ± 0.068 ± 0.024
-    - name: <Dmue_AFB>(B0->D*lnu)
+    - name: <Dmue_S9>(B0->D*lnu)
       q2min: 0
       q2max: 10.689
       value: 0.020 ± 0.047 ± 0.017
